@@ -24,7 +24,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 /// @file
-/// @brief Contains macros that simplify the syntax of container iteration.
+/// @brief Macros to simplify container iteration
 
 #ifndef AURORA_FOREACH_HPP
 #define AURORA_FOREACH_HPP

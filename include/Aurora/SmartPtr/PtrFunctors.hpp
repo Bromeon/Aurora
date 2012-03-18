@@ -23,7 +23,11 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#pragma once
+/// @file
+/// @brief Cloner and deleter functors for smart pointers
+
+#ifndef AURORA_PTRFUNCTORS_HPP
+#define AURORA_PTRFUNCTORS_HPP
 
 
 namespace aur
@@ -69,3 +73,5 @@ struct OperatorDelete
 /// @}
 
 } // namespace aur
+
+#endif // AURORA_PTRFUNCTORS_HPP
