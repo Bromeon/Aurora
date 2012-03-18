@@ -31,6 +31,7 @@
 
 #include <Aurora/SmartPtr/PtrFunctors.hpp>
 #include <Aurora/SmartPtr/Detail/PtrOwner.hpp>
+#include <Aurora/Tools/SafeBool.hpp>
 #include <Aurora/Config.hpp>
 
 #include <cstddef>
@@ -178,6 +179,14 @@ class CopiedPtr
 		{
 			assert(mPointer);
 			return mPointer;
+		}
+
+		/// @brief Checks if the smart pointer is not NULL.
+		/// @details Allows expressions of the form <i>if (ptr)</i> or <i>if (!ptr)</i>.
+		/// @return Value convertible to true, if CopiedPtr is not empty; value convertible to false otherwise
+		operator SafeBool() const
+		{
+			return ToSafeBool(mPointer);
 		}
 
 		/// @brief Permits access to the internal pointer. Designed for rare use.
