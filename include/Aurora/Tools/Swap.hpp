@@ -23,16 +23,24 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+/// @file
+/// @brief Macro to implement global swap() overload
+
 #ifndef AURORA_SWAP_HPP
 #define AURORA_SWAP_HPP
 
 
-// Macro to implement a global overload of swap(lhs, rhs) to allow argument-dependent lookup.
-// Accesses the memberfunction void Class::Swap(Class&).
-#define AUR_GLOBAL_SWAP(Class)				\
+/// @addtogroup Tools
+/// @{
+
+/// @brief Macro to implement a global overload of swap(lhs, rhs) to allow argument-dependent lookup.
+/// @details Accesses the memberfunction void Class::Swap(Class&).
+#define AURORA_GLOBAL_SWAP(Class)			\
 inline void swap(Class& lhs, Class& rhs)	\
 {											\
 	lhs.Swap(rhs);							\
 }
+
+/// @}
 
 #endif // AURORA_SWAP_HPP
