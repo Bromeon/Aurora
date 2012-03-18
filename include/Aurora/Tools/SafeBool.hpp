@@ -23,8 +23,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#ifndef AURORA_SAFEBOOLIDIOM_HPP
-#define AURORA_SAFEBOOLIDIOM_HPP
+#ifndef AURORA_SAFEBOOL_HPP
+#define AURORA_SAFEBOOL_HPP
 
 #include <cstddef> // NULL
 
@@ -41,22 +41,35 @@ namespace detail
 		void Function() {}
 	};
 
-	// SafeBool type: Pointer to member function
-	typedef void (SafeBoolHolder::*SafeBool)();
-
-	// SafeBoolTrue literal, evaluates to true
-	const SafeBool SafeBoolTrue = &SafeBoolHolder::Function;
-
-	// SafeBoolFalse literal, evaluates to false
-	const SafeBool SafeBoolFalse = NULL;
-
-	// Conversion function from bool to SafeBool
-	inline SafeBool ToSafeBool(bool condition)
-	{
-		return condition ? SafeBoolTrue : SafeBoolFalse;
-	}
-
 } // namespace detail
+
+// ---------------------------------------------------------------------------------------------------------------------------
+
+
+/// @addtogroup Tools
+/// @{
+
+/// @brief SafeBool type
+/// @hideinitializer
+AURORA_FAKE_DOC(typedef void (detail::SafeBoolHolder::*SafeBool)(), typedef bool SafeBool);
+
+/// @brief SafeBool literal, evaluates to true
+/// @hideinitializer
+const SafeBool SafeBoolTrue = &detail::SafeBoolHolder::Function;
+
+/// @brief SafeBool literal, evaluates to false
+/// @hideinitializer
+const SafeBool SafeBoolFalse = NULL;
+
+/// @brief Conversion function from bool to SafeBool
+///
+inline SafeBool ToSafeBool(bool condition)
+{
+	return condition ? SafeBoolTrue : SafeBoolFalse;
+}
+
+/// @}
+
 } // namespace aur
 
-#endif // AURORA_SAFEBOOLIDIOM_HPP
+#endif // AURORA_SAFEBOOL_HPP
