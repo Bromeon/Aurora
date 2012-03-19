@@ -245,6 +245,14 @@ class CopiedPtr
 	friend class CopiedPtr;
 };
 
+/// @relates CopiedPtr
+/// @brief Swaps the contents of two CopiedPtr instances.
+template <typename T>
+void swap(CopiedPtr<T>& lhs, CopiedPtr<T>& rhs)
+{
+	return lhs.swap(rhs);
+}
+
 /// @}
 
 } // namespace aur
