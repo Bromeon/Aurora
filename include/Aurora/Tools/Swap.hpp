@@ -38,7 +38,7 @@
 #define AURORA_GLOBAL_SWAP(Class)			\
 inline void swap(Class& lhs, Class& rhs)	\
 {											\
-	lhs.Swap(rhs);							\
+	lhs.swap(rhs);							\
 }
 
 /// @}

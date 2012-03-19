@@ -39,7 +39,7 @@ namespace detail
 	struct BinaryFunctionBase
 	{
 		// Calls the function corresponding to arg1's and arg2's dynamic type
-		virtual R Call(B arg1, B arg2) = 0;
+		virtual R call(B arg1, B arg2) = 0;
 
 		// Virtual destructor
 		virtual ~BinaryFunctionBase() {}
@@ -61,7 +61,7 @@ namespace detail
 		}
 
 		// Calls the function corresponding to ref's dynamic type
-		virtual R Call(B arg1, B arg2)
+		virtual R call(B arg1, B arg2)
 		{
 			// Drawback of static_cast: It doesn't work with virtual inheritance and deadly diamonds in general
 			return fn( static_cast<D1>(arg1), static_cast<D2>(arg2) );
@@ -92,7 +92,7 @@ namespace detail
 		}
 
 		// Calls the function corresponding to ref's dynamic type
-		virtual R Call(B arg1, B arg2)
+		virtual R call(B arg1, B arg2)
 		{
 			return (object.*fn)( static_cast<D1>(arg1), static_cast<D2>(arg2) );
 		}

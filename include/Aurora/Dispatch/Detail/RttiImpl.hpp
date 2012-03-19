@@ -65,20 +65,20 @@ namespace detail
 	struct RttiClassManager
 	{
 		// Return global instance
-		static RttiClassManager& Instance()
+		static RttiClassManager& instance()
 		{
 			static RttiClassManager instance;
 			return instance;
 		}
 
 		// Add type information for a base class
-		const RttiClassNode& InsertBase(TypeInfo base)
+		const RttiClassNode& insertBase(TypeInfo base)
 		{
 			return *types.insert(base).first;
 		}
 
 		// Add type information for a derived class (and its base class)
-		void InsertDerived(TypeInfo derived, const RttiClassNode& base)
+		void insertDerived(TypeInfo derived, const RttiClassNode& base)
 		{
 			std::set<RttiClassNode>::iterator itr = types.insert(derived).first;
 			assert(!itr->base);
@@ -87,7 +87,7 @@ namespace detail
 
 		// Fill container with direct and indirect base classes, if available.
 		// The container front contains the direct base, the back the indirect ones.
-		void GetBases(TypeInfo derived, std::vector<TypeInfo>& out)
+		void getBases(TypeInfo derived, std::vector<TypeInfo>& out)
 		{
 			// Add class itself
 			out.push_back(derived);
@@ -117,13 +117,13 @@ namespace detail
 	struct RttiClass
 	{
 		explicit RttiClass(TypeInfo type)
-		: base(RttiClassManager::Instance().InsertBase(type))
+		: base(RttiClassManager::instance().insertBase(type))
 		{
 		}
 
-		RttiClass& Derived(TypeInfo derived)
+		RttiClass& derived(TypeInfo derived)
 		{
-			RttiClassManager::Instance().InsertDerived(derived, base);
+			RttiClassManager::instance().insertDerived(derived, base);
 			return *this;
 		}
 
@@ -140,16 +140,16 @@ namespace detail
 	// ---------------------------------------------------------------------------------------------------------------------------
 
 	// Collects base classes of a class, registered with the AURORA_RTTI_... macros
-	inline void GetRttiBaseClasses(TypeInfo derived, std::vector<TypeInfo>& out)
+	inline void getRttiBaseClasses(TypeInfo derived, std::vector<TypeInfo>& out)
 	{
-		RttiClassManager::Instance().GetBases(derived, out);
+		RttiClassManager::instance().getBases(derived, out);
 	}
 
 	// Computes "indirection pairs" (x, y) which contain the distances from derived to base classes (x for lhs, y for rhs).
 	// indirectionLevel specifies the sum x+y for which pairs are generated.
 	// (0, 0) is the direct match; i.e. argument and parameter types are the same. (1, 0) requires a derived-to-base conversion
 	// of the first argument, (0, 1) one of the second argument, and so on.
-	inline void ComputeRttiBaseIndirections(int nbFirst, int nbSecond, int indirectionLevel, std::vector<IndirectionPair>& out)
+	inline void computeRttiBaseIndirections(int nbFirst, int nbSecond, int indirectionLevel, std::vector<IndirectionPair>& out)
 	{
 		const int end = std::min(nbFirst-1, indirectionLevel);
 		for (int i = std::max(indirectionLevel-nbSecond+1, 0); i <= end; ++i)

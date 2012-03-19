@@ -52,7 +52,7 @@ class TypeInfo
 		{
 		}
 
-		const char* GetName() const
+		const char* getName() const
 		{
 			return mTypeInfo->name();
 		}
@@ -87,20 +87,20 @@ namespace detail
 
 	// Returns the type-id of the object behind the pointer or reference
 	template <typename T>
-	TypeInfo DerefTypeid(T& reference)
+	TypeInfo derefTypeid(T& reference)
 	{
 		return typeid(reference);
 	}
 
 	template <typename T>
-	TypeInfo DerefTypeid(T* pointer)
+	TypeInfo derefTypeid(T* pointer)
 	{
 		return typeid(*pointer);
 	}
 
 	// Returns the type-id of U, when T=U*, otherwise of T
 	template <typename T>
-	TypeInfo DerefTypeid()
+	TypeInfo derefTypeid()
 	{
 		return typeid(typename std::tr1::remove_pointer<T>::type);
 	}

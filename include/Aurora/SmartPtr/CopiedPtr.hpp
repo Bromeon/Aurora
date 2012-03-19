@@ -68,7 +68,7 @@ class CopiedPtr
 		/// @param pointer Initial pointer value, can be NULL. Must be convertible to T*.
 		template <typename U>
 		explicit CopiedPtr(U* pointer)
-		: mOwner( detail::NewPtrOwner<T>(pointer, OperatorNewCopy<U>(), OperatorDelete<U>()) )
+		: mOwner( detail::newPtrOwner<T>(pointer, OperatorNewCopy<U>(), OperatorDelete<U>()) )
 		, mPointer(pointer)
 		{
 		}
@@ -80,7 +80,7 @@ class CopiedPtr
 		/// @param deleter Callable with signature <b>void(T*)</b> that is invoked during CopiedPtr destruction.
 		template <typename U, typename C, typename D>
 		CopiedPtr(U* pointer, C cloner, D deleter)
-		: mOwner( detail::NewPtrOwner<T>(pointer, cloner, deleter) )
+		: mOwner( detail::newPtrOwner<T>(pointer, cloner, deleter) )
 		, mPointer(pointer)
 		{
 		}
@@ -90,8 +90,8 @@ class CopiedPtr
 		/// @details If the origin's pointer is NULL, this pointer will also be NULL.
 		///  Otherwise, this instance will hold the pointer returned by the cloner.
 		CopiedPtr(const CopiedPtr& origin)
-		: mOwner(origin.mOwner ? origin.mOwner->Clone() : NULL)
-		, mPointer(origin.mOwner ? mOwner->GetPointer() : NULL)
+		: mOwner(origin.mOwner ? origin.mOwner->clone() : NULL)
+		, mPointer(origin.mOwner ? mOwner->getPointer() : NULL)
 		{
 		}
 
@@ -102,7 +102,7 @@ class CopiedPtr
 		template <typename U>
 		CopiedPtr(const CopiedPtr<U>& origin)
 		: mOwner(new detail::PtrIndirection<T, U>(origin.mOwner))
-		, mPointer(mOwner->GetPointer())
+		, mPointer(mOwner->getPointer())
 		{
 		}
 
@@ -124,7 +124,7 @@ class CopiedPtr
 		/// @details Can imply a copy and a destruction, invoking origin's cloner and this deleter.
 		CopiedPtr& operator= (const CopiedPtr& origin)
 		{
-			CopiedPtr(origin).Swap(*this);
+			CopiedPtr(origin).swap(*this);
 			return *this;
 		}
 
@@ -134,7 +134,7 @@ class CopiedPtr
 		template <typename U>
 		CopiedPtr& operator= (const CopiedPtr<U>& origin)
 		{
-			CopiedPtr(origin).Swap(*this);
+			CopiedPtr(origin).swap(*this);
 			return *this;
 		}
 
@@ -144,7 +144,7 @@ class CopiedPtr
 		template <typename U>
 		CopiedPtr& operator= (CopiedPtr<U>&& source)
 		{
-			CopiedPtr(std::move(source)).Swap(*this);
+			CopiedPtr(std::move(source)).swap(*this);
 			return *this;
 		}
 #endif // AURORA_HAS_CPP11
@@ -159,7 +159,7 @@ class CopiedPtr
 
 		/// @brief Exchanges the values of *this and @a other.
 		/// 
-		void Swap(CopiedPtr& other)
+		void swap(CopiedPtr& other)
 		{
 			std::swap(mOwner, other.mOwner);
 			std::swap(mPointer, other.mPointer);
@@ -186,40 +186,40 @@ class CopiedPtr
 		/// @return Value convertible to true, if CopiedPtr is not empty; value convertible to false otherwise
 		operator SafeBool() const
 		{
-			return ToSafeBool(mPointer);
+			return toSafeBool(mPointer);
 		}
 
 		/// @brief Permits access to the internal pointer. Designed for rare use.
 		/// @return Internally used pointer, use it wisely not to upset the CopiedPtr's memory management.
-		T* Get() const
+		T* get() const
 		{
 			return mPointer;
 		}
 
-		T* Release()
+		T* release()
 		{
-			mOwner->Dismiss();
+			mOwner->dismiss();
 
 			T* copy = mPointer;
 
-			Reset();
+			reset();
 			return copy;
 		}
 
 		/// @brief Reset to null pointer
 		/// @details If this instance currently holds a pointer, the old deleter is invoked.
-		void Reset()
+		void reset()
 		{
-			CopiedPtr().Swap(*this);
+			CopiedPtr().swap(*this);
 		}
 
 		/// @brief Reset to raw pointer
 		/// @param pointer Initial pointer value, can be NULL. Must be convertible to T*.
 		/// @details If this instance currently holds a pointer, the old deleter is invoked.
 		template <typename U>
-		void Reset(U* pointer)
+		void reset(U* pointer)
 		{
-			CopiedPtr(pointer).Swap(*this);
+			CopiedPtr(pointer).swap(*this);
 		}
 
 		/// @brief Reset to raw pointer with cloner and deleter
@@ -229,16 +229,10 @@ class CopiedPtr
 		/// @param deleter Callable with signature <b>void(T*)</b> that is invoked during CopiedPtr destruction.
 		/// @details If this instance currently holds a pointer, the old deleter is invoked.
 		template <typename U, typename C, typename D>
-		void Reset(U* pointer, C cloner, D deleter)
+		void reset(U* pointer, C cloner, D deleter)
 		{
-			CopiedPtr(pointer, cloner, deleter).Swap(*this);
+			CopiedPtr(pointer, cloner, deleter).swap(*this);
 		}
-
-
-	// ---------------------------------------------------------------------------------------------------------------------------
-	// Private member functions
-	private:
-		
 
 
 	// ---------------------------------------------------------------------------------------------------------------------------

@@ -66,7 +66,7 @@ namespace aur
 /// @brief Register runtime type information for a derived class
 /// @see AURORA_RTTI_BASE
 /// @hideinitializer
-#define AURORA_RTTI_DERIVED(DerivedClass)		.Derived(typeid(DerivedClass))
+#define AURORA_RTTI_DERIVED(DerivedClass)	.derived(typeid(DerivedClass))
 
 /// @}
 

@@ -54,7 +54,7 @@ struct VirtualClone
 {
 	T* operator() (const T* pointer) const
 	{
-		return pointer->Clone();
+		return pointer->clone();
 	}
 };
 

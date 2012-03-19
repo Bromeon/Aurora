@@ -37,68 +37,68 @@ SingleDispatcher<B, R>::SingleDispatcher(bool supportDerivedToBase)
 
 template <class B, typename R>
 template <class D>
-void SingleDispatcher<B, R>::Register(R (*globalFunction)( AURORA_REPLICATE(B,D) ))
+void SingleDispatcher<B, R>::add(R (*globalFunction)( AURORA_REPLICATE(B,D) ))
 {
 	// Without derived-to-base conversions, we can directly edit the cached map and save memory
-	InternalRegister(mDerivedToBase ? mMap : mCachedMap, typeid(D), 
+	registerFunction(mDerivedToBase ? mMap : mCachedMap, typeid(D), 
 		Value(new detail::UnaryGlobalFunction<B, AURORA_REPLICATE(B,D), R>(globalFunction)));
 }
 
 template <class B, typename R>
 template <class D, class C>
-void SingleDispatcher<B, R>::Register(R (C::*memberFunction)( AURORA_REPLICATE(B,D) ), C& object)
+void SingleDispatcher<B, R>::add(R (C::*memberFunction)( AURORA_REPLICATE(B,D) ), C& object)
 {
-	InternalRegister(mDerivedToBase ? mMap : mCachedMap, typeid(D),
+	registerFunction(mDerivedToBase ? mMap : mCachedMap, typeid(D),
 		Value(new detail::UnaryMemberFunction<B, AURORA_REPLICATE(B,D), R, C>(memberFunction, object)));
 }
 
 template <class B, typename R>
 template <class D, typename Fn>
-void SingleDispatcher<B, R>::Register(const Fn& functionObject)
+void SingleDispatcher<B, R>::add(const Fn& functionObject)
 {
-	InternalRegister(mDerivedToBase ? mMap : mCachedMap, typeid(D),
+	registerFunction(mDerivedToBase ? mMap : mCachedMap, typeid(D),
 		Value(new detail::UnaryGlobalFunction<B, AURORA_REPLICATE(B,D), R, Fn>(functionObject)));
 }
 
 template <class B, typename R>
-R SingleDispatcher<B, R>::Call(B arg) const
+R SingleDispatcher<B, R>::call(B arg) const
 {
-	EnsureCacheUpdate();
+	ensureCacheUpdate();
 
-	TypeInfo key = detail::DerefTypeid(arg);
-	typename FnMap::const_iterator directDispatchItr = Find(key, true);
+	TypeInfo key = detail::derefTypeid(arg);
+	typename FnMap::const_iterator directDispatchItr = findFunction(key, true);
 
 	// If function is directly found, call it
 	if (directDispatchItr != mCachedMap.end())
-		return directDispatchItr->value->Call(arg);
+		return directDispatchItr->value->call(arg);
 
 	// If derived-to-base conversions are enabled, look for base class functions to dispatch
 	if (mDerivedToBase)
 	{
 		std::vector<TypeInfo> bases;
-		detail::GetRttiBaseClasses(key, bases);
+		detail::getRttiBaseClasses(key, bases);
 
 		// Iterate through all direct and indirect base classes
 		AURORA_CITR_FOREACH(std::vector<TypeInfo>, bases, baseItr)
 		{
-			typename FnMap::const_iterator dispatchItr = Find(*baseItr);
+			typename FnMap::const_iterator dispatchItr = findFunction(*baseItr);
 
 			// Found match: Add entry to cache, call function
 			if (dispatchItr != mMap.end())
 			{
 				// We are sure the key isn't stored yet, otherwise the direct lookup would have found it
-				InternalRegister(mCachedMap, key, dispatchItr->value);
-				return dispatchItr->value->Call(arg);
+				registerFunction(mCachedMap, key, dispatchItr->value);
+				return dispatchItr->value->call(arg);
 			}
 		}
 	}
 
 	// If no corresponding class (or base class) has been found, throw exception
-	throw FunctionCallException(std::string("SingleDispatcher::Call() - function with parameter \"") + key.GetName() +  "\" not registered");
+	throw FunctionCallException(std::string("SingleDispatcher::Call() - function with parameter \"") + key.getName() +  "\" not registered");
 }
 
 template <class B, typename R>
-void SingleDispatcher<B, R>::InternalRegister(FnMap& fnMap, TypeInfo key, Value value) const
+void SingleDispatcher<B, R>::registerFunction(FnMap& fnMap, TypeInfo key, Value value) const
 {
 	// If we update the normal map, the cache becomes invalid
 	if (&fnMap == &mMap)
@@ -115,16 +115,16 @@ void SingleDispatcher<B, R>::InternalRegister(FnMap& fnMap, TypeInfo key, Value 
 }
 
 template <class B, typename R>
-typename SingleDispatcher<B, R>::FnMap::const_iterator SingleDispatcher<B, R>::Find(TypeInfo key, bool useCache) const
+typename SingleDispatcher<B, R>::FnMap::const_iterator SingleDispatcher<B, R>::findFunction(TypeInfo key, bool useCache) const
 {
 	const FnMap& fnMap = useCache ? mCachedMap : mMap;
 
 	// Note: We only compare keys anyway, that's why we can pass a null pointer as value	
-	return detail::BinarySearch(fnMap.begin(), fnMap.end(), Pair(key, Value()));
+	return detail::binarySearch(fnMap.begin(), fnMap.end(), Pair(key, Value()));
 }
 
 template <class B, typename R>
-void SingleDispatcher<B, R>::EnsureCacheUpdate() const
+void SingleDispatcher<B, R>::ensureCacheUpdate() const
 {
 	// If map has been changed, apply changes to cache
 	if (mNeedsCacheUpdate)

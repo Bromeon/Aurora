@@ -95,18 +95,18 @@ class DoubleDispatcher : private NonCopyable
 		/// @n Example (class hierarchy and dispatcher declaration missing):
 		/// @code 
 		/// // Overloaded global or namespace-level functions
-		/// void Func(Derived1&, Derived1&);
-		/// void Func(Derived1&, Derived2&);
-		/// void Func(Derived2&, Derived2&);
+		/// void func(Derived1&, Derived1&);
+		/// void func(Derived1&, Derived2&);
+		/// void func(Derived2&, Derived2&);
 		///
 		/// // Register functions
-		/// dispatcher.Register<Derived1, Derived1>(&Func);
-		/// dispatcher.Register<Derived1, Derived2>(&Func);
-		/// dispatcher.Register<Derived2, Derived2>(&Func);
+		/// dispatcher.add<Derived1, Derived1>(&func);
+		/// dispatcher.add<Derived1, Derived2>(&func);
+		/// dispatcher.add<Derived2, Derived2>(&func);
 		/// @endcode
 		/// @pre A function taking two arguments of dynamic type D1 and D2 is not registered yet.
 		template <class D1, class D2>
-		void						Register(R (*globalFunction)( AURORA_REPLICATE(B,D1), AURORA_REPLICATE(B,D2) ));
+		void						add(R (*globalFunction)( AURORA_REPLICATE(B,D1), AURORA_REPLICATE(B,D2) ));
 
 		/// @brief Registers a member function.
 		/// @tparam D1 Type of the derived class for the first parameter. Must be explicitly specified.
@@ -121,19 +121,19 @@ class DoubleDispatcher : private NonCopyable
 		/// // Class with overloaded member functions
 		/// struct MyClass
 		/// {
-		///     void MemFunc(Derived1&, Derived1&);
-		///     void MemFunc(Derived1&, Derived2&);
-		///     void MemFunc(Derived2&, Derived2&);
+		///     void memFunc(Derived1&, Derived1&);
+		///     void memFunc(Derived1&, Derived2&);
+		///     void memFunc(Derived2&, Derived2&);
 		/// } obj;
 		///
 		/// // Register member functions
-		/// dispatcher.Register<Derived1, Derived1>(&MyClass::MemFunc, obj);
-		/// dispatcher.Register<Derived1, Derived2>(&MyClass::MemFunc, obj);
-		/// dispatcher.Register<Derived2, Derived2>(&MyClass::MemFunc, obj);
+		/// dispatcher.add<Derived1, Derived1>(&MyClass::memFunc, obj);
+		/// dispatcher.add<Derived1, Derived2>(&MyClass::memFunc, obj);
+		/// dispatcher.add<Derived2, Derived2>(&MyClass::memFunc, obj);
 		/// @endcode
 		/// @pre A function taking two arguments of dynamic type D1 and D2 is not registered yet.
 		template <class D1, class D2, class C>
-		void						Register(R (C::*memberFunction)( AURORA_REPLICATE(B,D1), AURORA_REPLICATE(B,D2) ), C& object);
+		void						add(R (C::*memberFunction)( AURORA_REPLICATE(B,D1), AURORA_REPLICATE(B,D2) ), C& object);
 
 		/// @brief Registers a function object.
 		/// @tparam D1 Type of the derived class for the first parameter. Must be explicitly specified.
@@ -151,13 +151,13 @@ class DoubleDispatcher : private NonCopyable
 		/// };
 		///
 		/// // Register functor
-		/// dispatcher.Register<Derived1, Derived1>(Functor());
-		/// dispatcher.Register<Derived1, Derived2>(Functor());
-		/// dispatcher.Register<Derived2, Derived2>(Functor());
+		/// dispatcher.add<Derived1, Derived1>(Functor());
+		/// dispatcher.add<Derived1, Derived2>(Functor());
+		/// dispatcher.add<Derived2, Derived2>(Functor());
 		/// @endcode
 		/// @pre A function taking two arguments of dynamic type D1 and D2 is not registered yet.
 		template <class D1, class D2, typename Fn>
-		void						Register(const Fn& functionObject);
+		void						add(const Fn& functionObject);
 
 		/// @brief Dispatches the dynamic types of @a arg1 and @a arg2 and invokes the corresponding function.
 		/// @details Note that the argument's dynamic type must match @b exactly with the registered type, unless you enabled
@@ -168,7 +168,7 @@ class DoubleDispatcher : private NonCopyable
 		/// @return The return value of the dispatched function, if any.
 		/// @throw FunctionCallException when no corresponding function is found, or if a call is ambiguous. Ambiguity emerges
 		///  at derived-to-base conversions if multiple functions represent an equally good match for overload resolution.
-		R							Call(B arg1, B arg2) const;
+		R							call(B arg1, B arg2) const;
 
 
 	// ---------------------------------------------------------------------------------------------------------------------------
@@ -184,16 +184,16 @@ class DoubleDispatcher : private NonCopyable
 	// Private member functions
 	private:
 		// Registers the type-id key with its associated function value.
-		void							InternalRegister(FnMap& fnMap, TypeInfo key1, TypeInfo key2, Value value) const;
+		void							registerFunction(FnMap& fnMap, TypeInfo key1, TypeInfo key2, Value value) const;
 
 		// Finds the key in the map. Returns end() if not found.
-		typename FnMap::const_iterator	Find(TypeInfo key1, TypeInfo key2, bool useCache = false) const;
+		typename FnMap::const_iterator	findFunction(TypeInfo key1, TypeInfo key2, bool useCache = false) const;
 
 		// Make sure the cached map is updated
-		void							EnsureCacheUpdate() const;
+		void							ensureCacheUpdate() const;
 
 		// Makes sure that the keys are sorted in case we use symmetric argument dispatching.
-		Key								MakeArgumentPair(TypeInfo key1, TypeInfo key2) const;
+		Key								makeArgumentPair(TypeInfo key1, TypeInfo key2) const;
 
 
 	// ---------------------------------------------------------------------------------------------------------------------------
@@ -214,19 +214,19 @@ class DoubleDispatcher : private NonCopyable
 /// class Derived2 : public Base {};
 ///
 /// // Free functions for the derived types
-/// void Func(Derived1* lhs, Derived1* rhs);
-/// void Func(Derived1* lhs, Derived2* rhs);
-/// void Func(Derived2* lhs, Derived2* rhs);
+/// void func(Derived1* lhs, Derived1* rhs);
+/// void func(Derived1* lhs, Derived2* rhs);
+/// void func(Derived2* lhs, Derived2* rhs);
 ///
 /// // Create dispatcher and register functions
 /// aur::DoubleDispatcher<Base*> dispatcher;
-/// dispatcher.Register<Derived1, Derived1>(&Func);
-/// dispatcher.Register<Derived1, Derived2>(&Func);
-/// dispatcher.Register<Derived2, Derived2>(&Func);
+/// dispatcher.add<Derived1, Derived1>(&func);
+/// dispatcher.add<Derived1, Derived2>(&func);
+/// dispatcher.add<Derived2, Derived2>(&func);
 ///
 /// // Invoke functions on base class pointer
 /// Base* ptr = new Derived1;
-/// dispatcher.Call(ptr, ptr); // Invokes void Func(Derived1* lhs, Derived1* rhs);
+/// dispatcher.Call(ptr, ptr); // Invokes void func(Derived1* lhs, Derived1* rhs);
 /// delete ptr;
 /// @endcode
 

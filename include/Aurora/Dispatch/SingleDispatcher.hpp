@@ -91,16 +91,16 @@ class SingleDispatcher : private NonCopyable
 		/// @n Example (class hierarchy and dispatcher declaration missing):
 		/// @code 
 		/// // Overloaded global or namespace-level functions
-		/// void Func(Derived1&);
-		/// void Func(Derived2&);
+		/// void func(Derived1&);
+		/// void func(Derived2&);
 		///
 		/// // Register functions
-		/// dispatcher.Register<Derived1>(&Func);
-		/// dispatcher.Register<Derived2>(&Func);
+		/// dispatcher.add<Derived1>(&func);
+		/// dispatcher.add<Derived2>(&func);
 		/// @endcode
 		/// @pre A function taking an argument of dynamic type D is not registered yet.
 		template <class D>
-		void						Register(R (*globalFunction)( AURORA_REPLICATE(B,D) ));
+		void						add(R (*globalFunction)( AURORA_REPLICATE(B,D) ));
 
 		/// @brief Registers a member function.
 		/// @tparam D Type of the derived class. Must be explicitly specified.
@@ -114,17 +114,17 @@ class SingleDispatcher : private NonCopyable
 		/// // Class with member functions
 		/// struct MyClass
 		/// {
-		///     void MemFunc(Derived1&);
-		///     void MemFunc(Derived2&);
+		///     void memFunc(Derived1&);
+		///     void memFunc(Derived2&);
 		/// } obj;
 		///
 		/// // Register overloaded functions
-		/// dispatcher.Register<Derived1>(&MyClass::MemFunc, obj);
-		/// dispatcher.Register<Derived2>(&MyClass::MemFunc, obj);
+		/// dispatcher.add<Derived1>(&MyClass::memFunc, obj);
+		/// dispatcher.add<Derived2>(&MyClass::memFunc, obj);
 		/// @endcode
 		/// @pre A function taking an argument of dynamic type D is not registered yet.
 		template <class D, class C>
-		void						Register(R (C::*memberFunction)( AURORA_REPLICATE(B,D) ), C& object);
+		void						add(R (C::*memberFunction)( AURORA_REPLICATE(B,D) ), C& object);
 
 		/// @brief Registers a function object.
 		/// @tparam D Type of the derived class. Must be explicitly specified.
@@ -140,12 +140,12 @@ class SingleDispatcher : private NonCopyable
 		/// };
 		///
 		/// // Register functor
-		/// dispatcher.Register<Derived1>(Functor());
-		/// dispatcher.Register<Derived2>(Functor());
+		/// dispatcher.add<Derived1>(Functor());
+		/// dispatcher.add<Derived2>(Functor());
 		/// @endcode
 		/// @pre A function taking an argument of dynamic type D is not registered yet.
 		template <class D, typename Fn>
-		void						Register(const Fn& functionObject);
+		void						add(const Fn& functionObject);
 
 		/// @brief Dispatches the dynamic type of @a arg and invokes the corresponding function.
 		/// @details Note that the argument's dynamic type must match @b exactly with the registered type, unless you enabled
@@ -154,29 +154,29 @@ class SingleDispatcher : private NonCopyable
 		/// @param arg Function argument as a reference or pointer to the base class.
 		/// @return The return value of the dispatched function, if any.
 		/// @throw FunctionCallException when no corresponding function is found.
-		R							Call(B arg) const;
+		R							call(B arg) const;
 
 
 	// ---------------------------------------------------------------------------------------------------------------------------
 	// Private types
 	private:
-		typedef TypeInfo									Key;
+		typedef TypeInfo										Key;
 		typedef CopiedPtr< detail::UnaryFunctionBase<B, R> >	Value;
-		typedef detail::KeyValuePair<Key, Value>			Pair;
-		typedef std::vector<Pair>							FnMap;
+		typedef detail::KeyValuePair<Key, Value>				Pair;
+		typedef std::vector<Pair>								FnMap;
 
 
 	// ---------------------------------------------------------------------------------------------------------------------------
 	// Private member functions
 	private:
 		// Registers the type-id key with its associated function value
-		void							InternalRegister(FnMap& fnMap, TypeInfo key, Value value) const;
+		void							registerFunction(FnMap& fnMap, TypeInfo key, Value value) const;
 
 		// Finds the key in the map. Returns end() if not found.
-		typename FnMap::const_iterator	Find(TypeInfo key, bool useCache = false) const;
+		typename FnMap::const_iterator	findFunction(TypeInfo key, bool useCache = false) const;
 
 		// Make sure the cached map is updated
-		void							EnsureCacheUpdate() const;
+		void							ensureCacheUpdate() const;
 
 
 	// ---------------------------------------------------------------------------------------------------------------------------
@@ -196,17 +196,17 @@ class SingleDispatcher : private NonCopyable
 /// class Derived2 : public Base {};
 ///
 /// // Free functions for the derived types
-/// void Func(Derived1* d);
-/// void Func(Derived2* d);
+/// void func(Derived1* d);
+/// void func(Derived2* d);
 ///
 /// // Create dispatcher and register functions
 /// aur::SingleDispatcher<Base*> dispatcher;
-/// dispatcher.Register<Derived1>(&Func);
-/// dispatcher.Register<Derived2>(&Func);
+/// dispatcher.add<Derived1>(&func);
+/// dispatcher.add<Derived2>(&func);
 ///
 /// // Invoke functions on base class pointer
 /// Base* ptr = new Derived1;
-/// dispatcher.Call(ptr); // Invokes void Func(Derived1* d);
+/// dispatcher.Call(ptr); // Invokes void func(Derived1* d);
 /// delete ptr;
 /// @endcode
 

@@ -42,9 +42,14 @@ namespace detail
 	{
 		virtual ~PtrOwnerBase() {}
 
-		virtual PtrOwnerBase<T>*	Clone() const = 0;
-		virtual T*					GetPointer() const = 0;
-		virtual void				Dismiss() = 0;
+		// Returns an independent polymorphic copy
+		virtual PtrOwnerBase<T>*	clone() const = 0;
+
+		// Returns the stored pointer
+		virtual T*					getPointer() const = 0;
+		
+		// Deactivates the invocation of the deleter
+		virtual void				dismiss() = 0;
 	};
 
 
@@ -65,18 +70,18 @@ namespace detail
 				deleter(pointer);
 		}
 
-		virtual PtrOwner* Clone() const
+		virtual PtrOwner* clone() const
 		{
 			assert(pointer);
 			return new PtrOwner(cloner(pointer), cloner, deleter);
 		}
 
-		virtual T* GetPointer() const
+		virtual T* getPointer() const
 		{
 			return pointer;
 		}
 
-		virtual void Dismiss()
+		virtual void dismiss()
 		{
 			pointer = NULL;
 		}
@@ -91,7 +96,7 @@ namespace detail
 	struct PtrIndirection : PtrOwnerBase<T>
 	{
 		explicit PtrIndirection(const PtrOwnerBase<U>* originBase)
-		: base(originBase->Clone())
+		: base(originBase->clone())
 		{
 		}
 
@@ -100,26 +105,26 @@ namespace detail
 			delete base;
 		}
 
-		virtual PtrIndirection<T, U>* Clone() const
+		virtual PtrIndirection<T, U>* clone() const
 		{
 			return new PtrIndirection<T, U>(base);
 		}
 
-		virtual T* GetPointer() const
+		virtual T* getPointer() const
 		{
-			return base->GetPointer();
+			return base->getPointer();
 		}
 
-		virtual void Dismiss()
+		virtual void dismiss()
 		{
-			base->Dismiss();
+			base->dismiss();
 		}
 
 		PtrOwnerBase<U>* base;
 	};
 	
 	template <typename T, typename U, typename C, typename D>
-	PtrOwnerBase<T>* NewPtrOwner(U* pointer, C cloner, D deleter)
+	PtrOwnerBase<T>* newPtrOwner(U* pointer, C cloner, D deleter)
 	{
 		return new PtrOwner<T, U, C, D>(pointer, cloner, deleter);
 	}

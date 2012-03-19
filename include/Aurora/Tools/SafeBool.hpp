@@ -23,6 +23,9 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+/// @file
+/// @brief Type aur::SafeBool and corresponding functionality
+
 #ifndef AURORA_SAFEBOOL_HPP
 #define AURORA_SAFEBOOL_HPP
 
@@ -51,7 +54,8 @@ namespace detail
 
 /// @brief SafeBool type
 /// @hideinitializer
-AURORA_FAKE_DOC(typedef void (detail::SafeBoolHolder::*SafeBool)(), typedef bool SafeBool);
+typedef void (detail::SafeBoolHolder::*SafeBool)();
+//AURORA_FAKE_DOC(typedef void (detail::SafeBoolHolder::*SafeBool)(), typedef bool SafeBool);
 
 /// @brief SafeBool literal, evaluates to true
 /// @hideinitializer
@@ -63,7 +67,7 @@ const SafeBool SafeBoolFalse = NULL;
 
 /// @brief Conversion function from bool to SafeBool
 ///
-inline SafeBool ToSafeBool(bool condition)
+inline SafeBool toSafeBool(bool condition)
 {
 	return condition ? SafeBoolTrue : SafeBoolFalse;
 }

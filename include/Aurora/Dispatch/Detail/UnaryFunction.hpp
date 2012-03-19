@@ -39,7 +39,7 @@ namespace detail
 	struct UnaryFunctionBase
 	{
 		// Calls the function corresponding to ref's dynamic type
-		virtual R Call(B arg) = 0;
+		virtual R call(B arg) = 0;
 
 		// Virtual destructor
 		virtual ~UnaryFunctionBase() {}
@@ -60,7 +60,7 @@ namespace detail
 		}
 
 		// Calls the function corresponding to arg's dynamic type
-		virtual R Call(B arg)
+		virtual R call(B arg)
 		{
 			// Drawback of static_cast: It doesn't work with virtual inheritance and deadly diamonds in general
 			return fn( static_cast<D>(arg) );
@@ -90,7 +90,7 @@ namespace detail
 		}
 
 		// Calls the function corresponding to ref's dynamic type
-		virtual R Call(B arg)
+		virtual R call(B arg)
 		{
 			return (object.*fn)( static_cast<D>(arg) );
 		}

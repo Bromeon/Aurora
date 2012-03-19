@@ -60,7 +60,7 @@ namespace detail
 	
 	// Are values equivalent with respect to sorting criterion? (Not necessarily equal)
 	template <typename T>
-	bool Equivalent(const T& lhs, const T& rhs)
+	bool equivalent(const T& lhs, const T& rhs)
 	{
 		return !(lhs < rhs) && !(rhs < lhs);
 	}
@@ -68,13 +68,13 @@ namespace detail
 	// Binary search with useful return value, in contrast to std::binary_search()
 	// Returns either iterator to first found element, or end-iterator of sequence
 	template <typename ForwardIterator, typename T>
-	ForwardIterator BinarySearch(ForwardIterator first, ForwardIterator last, const T& value)
+	ForwardIterator binarySearch(ForwardIterator first, ForwardIterator last, const T& value)
 	{
 		// Note: std::lower_bound() has O(log n) on random access iterators 
 		ForwardIterator result = std::lower_bound(first, last, value);
 
 		// std::lower_bound() returns iterator to first element >= value, which can be inequal to value
-		if (result == last || !Equivalent(*result, value))
+		if (result == last || !equivalent(*result, value))
 			return last;
 		else
 			return result;
