@@ -186,7 +186,7 @@ class CopiedPtr
 		/// @return Value convertible to true, if CopiedPtr is not empty; value convertible to false otherwise
 		operator SafeBool() const
 		{
-			return toSafeBool(mPointer);
+			return toSafeBool(mPointer != NULL);
 		}
 
 		/// @brief Permits access to the internal pointer. Designed for rare use.
