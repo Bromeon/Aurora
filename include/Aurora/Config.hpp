@@ -38,10 +38,9 @@
 #endif // _MSC_VER
 
 
-// C++11 support - define AURORA_CPP11 to 0 in order to disable C++11 features.
-#if _MSC_VER >= 1600 || __GNUC__ >= 4 && __GNUC_MINOR__ >= 5
-	#define AURORA_HAS_CPP11
-#endif
+// C++11 support
+// Define AURORA_HAS_CPP11 to activate C++11 features.
+
 
 // Version of the library
 #define AURORA_VERSION_MAJOR 1
