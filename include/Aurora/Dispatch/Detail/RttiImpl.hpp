@@ -74,7 +74,7 @@ namespace detail
 		// Add type information for a base class
 		const RttiClassNode& insertBase(TypeInfo base)
 		{
-			return *types.insert(base).first;
+			return *types.insert(RttiClassNode(base)).first;
 		}
 
 		// Add type information for a derived class (and its base class)
