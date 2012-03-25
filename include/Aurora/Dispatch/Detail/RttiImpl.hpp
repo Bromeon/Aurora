@@ -80,7 +80,7 @@ namespace detail
 		// Add type information for a derived class (and its base class)
 		void insertDerived(TypeInfo derived, const RttiClassNode& base)
 		{
-			std::set<RttiClassNode>::iterator itr = types.insert(derived).first;
+			std::set<RttiClassNode>::iterator itr = types.insert(RttiClassNode(derived)).first;
 			assert(!itr->base);
 			itr->base = &base;
 		}
