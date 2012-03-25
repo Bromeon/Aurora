@@ -29,6 +29,7 @@
 #ifndef AURORA_DISTRIBUTION_HPP
 #define AURORA_DISTRIBUTION_HPP
 
+#include <Aurora/Tools/Detail/Metaprogramming.hpp>
 #include <Aurora/Config.hpp>
 
 #include AURORA_TR1_HEADER(functional)
@@ -68,20 +69,24 @@ template <typename T>
 class Distribution
 {
 	// ---------------------------------------------------------------------------------------------------------------------------
+	// Private types
+	private:
+		typedef std::tr1::function<T()> FactoryFn;
+	
+		
+	// ---------------------------------------------------------------------------------------------------------------------------
 	// Public member functions
 	public:
 		/// @brief Implicit constructor from a constant value
-		/// @details 
-									Distribution(const T& constant)
-		: mFactory(detail::Constant<T>(constant))
+		/// @details
+		template <typename U>
+									Distribution(U initializer)
+		: mFactory(typename detail::Conditional<
+				std::tr1::is_convertible<U, T>::value,
+				detail::Constant<T>,
+				FactoryFn
+			>::Type(initializer))
 		{
-		}
-
-		/// @brief Implicit constructor from std::tr1::function
-		/// @details 
-									Distribution(std::tr1::function<T()> factory)
-		{
-			mFactory.swap(factory);
 		}
 
 		/// @brief Returns a value according to the distribution.
@@ -102,7 +107,7 @@ class Distribution
 	// ---------------------------------------------------------------------------------------------------------------------------
 	// Private variables
 	private:
-		std::tr1::function<T()>		mFactory;	
+		FactoryFn					mFactory;	
 };
 
 /// @relates 
