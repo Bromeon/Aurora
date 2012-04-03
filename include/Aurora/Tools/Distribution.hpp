@@ -64,7 +64,8 @@ namespace aur
 
 /// @brief Class holding a rule to create values with predefined properties
 /// @details Contains a callback that returns values on demand. These can be constant (always the same value), according to a
-///  random distribution, or be read from a value elsewhere in your code.
+///  random distribution, or be read from a value elsewhere in your code. Generally, the callback can be any function, member
+///  function or functor returning a value of type T and taking no arguments.
 template <typename T>
 class Distribution
 {
@@ -77,8 +78,9 @@ class Distribution
 	// ---------------------------------------------------------------------------------------------------------------------------
 	// Public member functions
 	public:
-		/// @brief Implicit constructor from a constant value
-		/// @details
+		/// @brief Construct from constant or function
+		/// @param initializer Can either be convertible to T; in this case, the distribution constantly returns its value.
+		///  @n Otherwise, @a initializer shall be convertible to std::function<T()> in order to act as a function.
 		template <typename U>
 									Distribution(U initializer)
 		: mFactory(typename detail::Conditional<
@@ -110,7 +112,7 @@ class Distribution
 		FactoryFn					mFactory;	
 };
 
-/// @relates 
+/// @relates Distribution
 /// @brief Swaps two Distribution<T> instances.
 template <typename T>
 void swap(Distribution<T>& lhs, Distribution<T>& rhs)
