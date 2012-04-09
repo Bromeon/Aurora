@@ -37,27 +37,6 @@
 
 namespace aur
 {
-	namespace detail
-	{
-
-		template <typename T>
-		struct Constant
-		{
-			explicit Constant(T value)
-			: value(value)
-			{
-			}
-
-			T operator() () const
-			{
-				return value;
-			}
-
-			T value;
-		};
-
-	} // namespace detail
-
 
 /// @addtogroup Tools
 /// @{
@@ -72,22 +51,28 @@ class Distribution
 	// ---------------------------------------------------------------------------------------------------------------------------
 	// Private types
 	private:
-		typedef std::tr1::function<T()> FactoryFn;
+		typedef std::function<T()> FactoryFn;
 	
 		
 	// ---------------------------------------------------------------------------------------------------------------------------
 	// Public member functions
 	public:
-		/// @brief Construct from constant or function
-		/// @param initializer Can either be convertible to T; in this case, the distribution constantly returns its value.
-		///  @n Otherwise, @a initializer shall be convertible to std::function<T()> in order to act as a function.
+		/// @brief Construct from constant
+		/// @param constant Constant value convertible to T.
 		template <typename U>
-									Distribution(U initializer)
-		: mFactory(typename std::conditional<
-				std::is_convertible<U, T>::value,
-				detail::Constant<T>,
-				FactoryFn
-			>::type(initializer))
+									Distribution(U constant AURORA_ENABLE_IF(std::is_convertible<U, T>::value))
+		: mFactory()
+		{
+			// Convert to T first to avoid conversion happening at every function call.
+			T copy = constant;
+			mFactory = [copy] () { return copy; };
+		}
+
+		/// @brief Construct from distribution function
+		/// @param function Callable convertible to std::function<T()> in order to act as distribution function.
+		template <typename Fn>
+									Distribution(Fn function AURORA_ENABLE_IF(!std::is_convertible<Fn, T>::value))
+		: mFactory(function)
 		{
 		}
 
