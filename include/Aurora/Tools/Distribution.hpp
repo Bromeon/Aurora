@@ -29,7 +29,7 @@
 #ifndef AURORA_DISTRIBUTION_HPP
 #define AURORA_DISTRIBUTION_HPP
 
-#include <Aurora/Tools/Detail/Metaprogramming.hpp>
+#include <Aurora/Tools/Metaprogramming.hpp>
 #include <Aurora/Config.hpp>
 
 #include <functional>
@@ -83,11 +83,11 @@ class Distribution
 		///  @n Otherwise, @a initializer shall be convertible to std::function<T()> in order to act as a function.
 		template <typename U>
 									Distribution(U initializer)
-		: mFactory(typename detail::Conditional<
-				std::tr1::is_convertible<U, T>::value,
+		: mFactory(typename std::conditional<
+				std::is_convertible<U, T>::value,
 				detail::Constant<T>,
 				FactoryFn
-			>::Type(initializer))
+			>::type(initializer))
 		{
 		}
 

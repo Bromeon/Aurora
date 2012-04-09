@@ -37,7 +37,7 @@
 #include <Aurora/Tools/TypeInfo.hpp>
 #include <Aurora/Tools/Exceptions.hpp>
 #include <Aurora/Tools/ForEach.hpp>
-#include <Aurora/Tools/Detail/Metaprogramming.hpp>
+#include <Aurora/Tools/Metaprogramming.hpp>
 #include <Aurora/Config.hpp>
 
 #include <vector>

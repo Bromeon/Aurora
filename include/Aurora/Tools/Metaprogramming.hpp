@@ -33,23 +33,41 @@
 
 namespace aur
 {
+
+/// @addtogroup Tools
+/// @{
+	
+/// @brief Simple type wrapper, can be used for overload resolution.
+///
+template <typename T>
+struct Type
+{
+};
+
+/// @brief Simple integer wrapper, can be used for overload resolution.
+///
+template <int N>
+struct Int
+{
+};
+
+
+/// @brief SFINAE Enable If Macro for parameter lists
+/// @details Usage:
+/// @code
+///  template <typename T>
+///  void Function(T value
+///      AURORA_ENABLE_IF(std::is_integral<T>::value));
+/// @endcode
+#define AURORA_ENABLE_IF(...)  , typename std::enable_if<__VA_ARGS__>::type* = nullptr
+
+/// @}
+
+// ---------------------------------------------------------------------------------------------------------------------------
+	
+
 namespace detail
 {
-
-	// Selects a type depending on a boolean condition.
-	// If Condition is true, the result member Type evaluates to TrueType, otherwise to FalseType.
-	template <bool Condition, typename TrueType, typename FalseType>
-	struct Conditional
-	{
-		typedef TrueType Type;
-	};
-
-	template <typename TrueType, typename FalseType>
-	struct Conditional<false, TrueType, FalseType>
-	{
-		typedef FalseType Type;
-	};
-
 
 	// Removes reference and pointer attribute from type
 	template <typename T>
@@ -57,65 +75,38 @@ namespace detail
 	{
 		typedef typename std::remove_pointer<
 			typename std::remove_reference<T>::type
-		>::type Type;
+		>::type type;
 	};
 
 
 	// Removes reference, pointer and const attribute from type
 	template <typename T>
-	struct Decay
+	struct RawType
 	{
 		typedef typename std::remove_const<
-			typename RemoveIndirection<T>::Type
-		>::type Type;
+			typename RemoveIndirection<T>::type
+		>::type type;
 	};
-
-
-	// Type wrapper for overloaded functions
-	template <typename T>
-	struct Type2Type
-	{
-	};
-
-	// Integer wrapper for overloaded functions
-	template <int N>
-	struct Int2Type
-	{
-	};
-
-
-	// SFINAE Enable If
-	template <bool Condition>
-	struct EnableIf;
-
-	template <>
-	struct EnableIf<true>
-	{
-		typedef void Type;
-	};
-
-	#define AURORA_ENABLE_IF(...)  typename ::aur::detail::EnableIf<__VA_ARGS__>::Type* = nullptr
-	#define AURORA_DISABLE_IF(...) AURORA_ENABLE_IF(!(__VA_ARGS__))
 
 
 	// Adjusts New such that it has the same const, pointer, reference attributes as Origin
 	template <typename Origin, typename New>
 	struct Replicate
 	{
-		typedef typename Decay<New>::Type														New0;
+		typedef typename RawType<New>::type																			raw;
 
-		typedef typename Conditional<
-			std::is_const<typename RemoveIndirection<Origin>::Type>::value,
-			const New0,
-			New0>::Type																			New1;
+		typedef typename std::conditional<
+			std::is_const<typename RemoveIndirection<Origin>::type>::value,
+			const raw,
+			raw>::type																								c_qualified;
 
-		typedef typename Conditional<std::is_pointer<Origin>::value, New1*, New1>::Type	New2;
-		typedef typename Conditional<std::is_reference<Origin>::value, New2&, New2>::Type	New3;
-		typedef typename Conditional<std::is_const<Origin>::value, const New3, New3>::Type	Type;
+		typedef typename std::conditional<std::is_pointer<Origin>::value, c_qualified*, c_qualified>::type			cp_qualified;
+		typedef typename std::conditional<std::is_reference<Origin>::value, cp_qualified&, cp_qualified>::type		cpr_qualified;
+		typedef typename std::conditional<std::is_const<Origin>::value, const cpr_qualified, cpr_qualified>::type	type;
 	};
 
 	// Human-readable form
-	#define AURORA_REPLICATE(Origin, New) typename aur::detail::Replicate<Origin, New>::Type
+	#define AURORA_REPLICATE(Origin, New) typename aur::detail::Replicate<Origin, New>::type
 	
 } // namespace detail
 } // namespace aur
