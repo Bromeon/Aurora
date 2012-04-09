@@ -28,7 +28,7 @@
 
 #include <Aurora/Config.hpp>
 
-#include AURORA_TR1_HEADER(type_traits)
+#include <type_traits>
 
 
 namespace aur
@@ -55,8 +55,8 @@ namespace detail
 	template <typename T>
 	struct RemoveIndirection
 	{
-		typedef typename std::tr1::remove_pointer<
-			typename std::tr1::remove_reference<T>::type
+		typedef typename std::remove_pointer<
+			typename std::remove_reference<T>::type
 		>::type Type;
 	};
 
@@ -65,7 +65,7 @@ namespace detail
 	template <typename T>
 	struct Decay
 	{
-		typedef typename std::tr1::remove_const<
+		typedef typename std::remove_const<
 			typename RemoveIndirection<T>::Type
 		>::type Type;
 	};
@@ -105,13 +105,13 @@ namespace detail
 		typedef typename Decay<New>::Type														New0;
 
 		typedef typename Conditional<
-			std::tr1::is_const<typename RemoveIndirection<Origin>::Type>::value,
+			std::is_const<typename RemoveIndirection<Origin>::Type>::value,
 			const New0,
 			New0>::Type																			New1;
 
-		typedef typename Conditional<std::tr1::is_pointer<Origin>::value, New1*, New1>::Type	New2;
-		typedef typename Conditional<std::tr1::is_reference<Origin>::value, New2&, New2>::Type	New3;
-		typedef typename Conditional<std::tr1::is_const<Origin>::value, const New3, New3>::Type	Type;
+		typedef typename Conditional<std::is_pointer<Origin>::value, New1*, New1>::Type	New2;
+		typedef typename Conditional<std::is_reference<Origin>::value, New2&, New2>::Type	New3;
+		typedef typename Conditional<std::is_const<Origin>::value, const New3, New3>::Type	Type;
 	};
 
 	// Human-readable form

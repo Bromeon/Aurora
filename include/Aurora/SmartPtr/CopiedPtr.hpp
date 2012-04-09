@@ -36,7 +36,8 @@
 
 #include <cstddef>
 #include <algorithm>
-#include AURORA_TR1_HEADER(type_traits)
+#include <type_traits>
+
 
 namespace aur
 {
@@ -167,7 +168,7 @@ class CopiedPtr
 		
 		/// @brief Dereferences the pointer.
 		/// 
-		AURORA_FAKE_DOC(typename std::tr1::add_reference<T>::type, T&) operator* () const
+		AURORA_FAKE_DOC(typename std::add_reference<T>::type, T&) operator* () const
 		{
 			assert(mPointer);
 			return *mPointer;

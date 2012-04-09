@@ -32,7 +32,7 @@
 #include <Aurora/Tools/Detail/Metaprogramming.hpp>
 #include <Aurora/Config.hpp>
 
-#include AURORA_TR1_HEADER(functional)
+#include <functional>
 
 
 namespace aur
