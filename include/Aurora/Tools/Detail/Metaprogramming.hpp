@@ -94,7 +94,7 @@ namespace detail
 		typedef void Type;
 	};
 
-	#define AURORA_ENABLE_IF(...)  typename ::aur::detail::EnableIf<__VA_ARGS__>::Type* = NULL
+	#define AURORA_ENABLE_IF(...)  typename ::aur::detail::EnableIf<__VA_ARGS__>::Type* = nullptr
 	#define AURORA_DISABLE_IF(...) AURORA_ENABLE_IF(!(__VA_ARGS__))
 
 
