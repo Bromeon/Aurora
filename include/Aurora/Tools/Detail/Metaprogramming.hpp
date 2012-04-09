@@ -116,35 +116,7 @@ namespace detail
 
 	// Human-readable form
 	#define AURORA_REPLICATE(Origin, New) typename aur::detail::Replicate<Origin, New>::Type
-
-
-	// Static assertion
-	// Generates a compiler error upon false condition.
-	template <bool Condition>
-	struct StaticAssert
-	{
-	};
-
-	template <>
-	struct StaticAssert<false>;
-
-	template <int N>
-	struct StaticChecker
-	{
-	};
-
-	// Macro concatenation, evaluating arguments
-	#define AURORA_DETAIL_PP_CONCAT_IMPL(a, b) a ## b
-	#define AURORA_DETAIL_PP_CONCAT(a, b) AURORA_DETAIL_PP_CONCAT_IMPL(a, b)
-
-#ifdef AURORA_HAS_CPP11
-	#define AURORA_STATIC_ASSERT(condition) static_assert(condition, "Static assertion failed.");
-#else
-	// Static assert: Use line-dependent macro to avoid name collisions with multiple static asserts in the same scope
-	#define AURORA_STATIC_ASSERT(condition) typedef aur::detail::StaticChecker< sizeof(aur::detail::StaticAssert<(condition)>) > \
-		AURORA_DETAIL_PP_CONCAT(aurStaticChecker, __LINE__);
-#endif // AURORA_HAS_CPP11
-
+	
 } // namespace detail
 } // namespace aur
 

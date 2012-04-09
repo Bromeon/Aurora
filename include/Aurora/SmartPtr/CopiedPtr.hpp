@@ -106,7 +106,6 @@ class CopiedPtr
 		{
 		}
 
-#ifdef AURORA_HAS_CPP11
 		/// @brief Move constructor
 		/// @param source RValue reference to object of which the ownership is taken.
 		template <typename U>
@@ -117,7 +116,6 @@ class CopiedPtr
 			source.mOwner = nullptr;
 			source.mPointer = nullptr;
 		}
-#endif // AURORA_HAS_CPP11
 
 		/// @brief Copy assignment operator
 		/// @param origin Original smart pointer
@@ -138,7 +136,6 @@ class CopiedPtr
 			return *this;
 		}
 
-#ifdef AURORA_HAS_CPP11
 		/// @brief Move assignment operator
 		/// @param source RValue reference to object of which the ownership is taken.
 		template <typename U>
@@ -147,7 +144,6 @@ class CopiedPtr
 			CopiedPtr(std::move(source)).swap(*this);
 			return *this;
 		}
-#endif // AURORA_HAS_CPP11
 
 		/// @brief Destructor
 		/// @details Invokes the deleter with the stored pointer as argument.
