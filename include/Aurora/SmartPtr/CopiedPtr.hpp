@@ -24,7 +24,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 /// @file
-/// @brief Class template aur::CopiedPtr
+/// @brief Class template aurora::CopiedPtr
 
 #ifndef AURORA_COPIEDPTR_HPP
 #define AURORA_COPIEDPTR_HPP
@@ -38,7 +38,7 @@
 #include <type_traits>
 
 
-namespace aur
+namespace aurora
 {
 
 /// @addtogroup SmartPtr
@@ -273,6 +273,6 @@ void swap(CopiedPtr<T>& lhs, CopiedPtr<T>& rhs)
 
 /// @}
 
-} // namespace aur
+} // namespace aurora
 
 #endif // AURORA_COPIEDPTR_HPP

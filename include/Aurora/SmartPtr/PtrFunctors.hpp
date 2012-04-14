@@ -32,7 +32,7 @@
 #include <Aurora/Tools/Metaprogramming.hpp>
 
 
-namespace aur
+namespace aurora
 {
 
 /// @addtogroup SmartPtr
@@ -78,6 +78,6 @@ struct OperatorDelete
 
 /// @}
 
-} // namespace aur
+} // namespace aurora
 
 #endif // AURORA_PTRFUNCTORS_HPP

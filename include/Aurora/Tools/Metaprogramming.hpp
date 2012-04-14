@@ -31,7 +31,7 @@
 #include <type_traits>
 
 
-namespace aur
+namespace aurora
 {
 
 /// @addtogroup Tools
@@ -120,9 +120,9 @@ namespace detail
 	};
 
 	// Human-readable form
-	#define AURORA_REPLICATE(Origin, New) typename aur::detail::Replicate<Origin, New>::type
+	#define AURORA_REPLICATE(Origin, New) typename aurora::detail::Replicate<Origin, New>::type
 	
 } // namespace detail
-} // namespace aur
+} // namespace aurora
 
 #endif // AURORA_METAPROGRAMMING_HPP

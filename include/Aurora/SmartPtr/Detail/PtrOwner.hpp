@@ -30,7 +30,7 @@
 #include <cassert>
 
 
-namespace aur
+namespace aurora
 {
 namespace detail
 {
@@ -125,4 +125,4 @@ namespace detail
 	}
 
 } // namespace detail
-} // namespace aur
+} // namespace aurora
