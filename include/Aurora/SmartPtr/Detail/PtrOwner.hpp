@@ -35,6 +35,10 @@ namespace aur
 namespace detail
 {
 	
+	// Types to differ between move and copy semantics
+	struct CopyTag {};
+	struct MoveTag {};
+
 	// Abstract base class for pointer owners
 	template <typename T>
 	struct PtrOwnerBase
@@ -86,8 +90,13 @@ namespace detail
 	template <typename T, typename U>
 	struct PtrIndirection : PtrOwnerBase<T>
 	{
-		explicit PtrIndirection(const PtrOwnerBase<U>* originBase)
+		explicit PtrIndirection(const PtrOwnerBase<U>* originBase, CopyTag)
 		: base(originBase->clone())
+		{
+		}
+
+		explicit PtrIndirection(PtrOwnerBase<U>* sourceBase, MoveTag)
+		: base(sourceBase)
 		{
 		}
 
@@ -98,7 +107,7 @@ namespace detail
 
 		virtual PtrIndirection<T, U>* clone() const
 		{
-			return new PtrIndirection<T, U>(base);
+			return new PtrIndirection<T, U>(base, CopyTag());
 		}
 
 		virtual T* getPointer() const

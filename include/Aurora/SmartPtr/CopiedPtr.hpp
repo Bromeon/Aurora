@@ -121,7 +121,7 @@ class CopiedPtr
 		///  Otherwise, this instance will hold the pointer returned by the cloner.
 		template <typename U>
 		CopiedPtr(const CopiedPtr<U>& origin)
-		: mOwner(new detail::PtrIndirection<T, U>(origin.mOwner))
+		: mOwner(new detail::PtrIndirection<T, U>(origin.mOwner, detail::CopyTag()))
 		, mPointer(mOwner->getPointer())
 		{
 		}
@@ -130,7 +130,7 @@ class CopiedPtr
 		/// @param source RValue reference to object of which the ownership is taken.
 		template <typename U>
 		CopiedPtr(CopiedPtr<U>&& source)
-		: mOwner(source.mOwner)
+		: mOwner(new detail::PtrIndirection<T, U>(source.mOwner, detail::MoveTag()))
 		, mPointer(source.mPointer)
 		{
 			source.mOwner = nullptr;
