@@ -64,11 +64,31 @@ class CopiedPtr
 		{
 		}
 
+		/// @brief Construct from nullptr
+		/// @details Allows conversions from the @a nullptr literal to a CopiedPtr.
+		CopiedPtr(std::nullptr_t)
+		: mOwner(nullptr)
+		, mPointer(nullptr)
+		{
+		}
+
 		/// @brief Construct from raw pointer
 		/// @param pointer Initial pointer value, can be nullptr. Must be convertible to T*.
 		template <typename U>
 		explicit CopiedPtr(U* pointer)
 		: mOwner( detail::newPtrOwner<T>(pointer, OperatorNewCopy<U>(), OperatorDelete<U>()) )
+		, mPointer(pointer)
+		{
+		}
+
+		/// @brief Construct from raw pointer with cloner
+		/// @param pointer Initial pointer value, can be nullptr. Must be convertible to T*.
+		/// @param cloner Callable with signature <b>T*(const T*)</b> that is invoked during CopiedPtr copies.
+		///  Must return a pointer to a copy of the argument.
+		/// @details Uses OperatorDelete<U> as deleter. Make sure your cloner returns an object allocated with new.
+		template <typename U, typename C>
+		CopiedPtr(U* pointer, C cloner)
+		: mOwner( detail::newPtrOwner<T>(pointer, cloner, OperatorDelete<U>()) )
 		, mPointer(pointer)
 		{
 		}
@@ -87,7 +107,7 @@ class CopiedPtr
 
 		/// @brief Copy constructor
 		/// @param origin Original smart pointer
-		/// @details If the origin's pointer is nullptr, this pointer will also be nullptr.
+		/// @details If the origin's pointer is @a nullptr, this pointer will also be @a nullptr.
 		///  Otherwise, this instance will hold the pointer returned by the cloner.
 		CopiedPtr(const CopiedPtr& origin)
 		: mOwner(origin.mOwner ? origin.mOwner->clone() : nullptr)
@@ -97,7 +117,7 @@ class CopiedPtr
 
 		/// @brief Construct from different CopiedPtr
 		/// @param origin Original smart pointer, where U* convertible to T*. Can refer to a derived object.
-		/// @details If the origin's pointer is nullptr, this pointer will also be nullptr.
+		/// @details If the origin's pointer is @a nullptr, this pointer will also be @a nullptr.
 		///  Otherwise, this instance will hold the pointer returned by the cloner.
 		template <typename U>
 		CopiedPtr(const CopiedPtr<U>& origin)
@@ -206,6 +226,18 @@ class CopiedPtr
 		void reset(U* pointer)
 		{
 			CopiedPtr(pointer).swap(*this);
+		}
+
+		/// @brief Reset to raw pointer with cloner
+		/// @param pointer Initial pointer value, can be nullptr. Must be convertible to T*.
+		/// @param cloner Callable with signature <b>T*(const T*)</b> that is invoked during CopiedPtr copies.
+		///  Must return a pointer to a copy of the argument. 
+		/// @details If this instance currently holds a pointer, the old deleter is invoked. 
+		///  @n Uses OperatorDelete<U> as deleter. Make sure your cloner returns an object allocated with new.
+		template <typename U, typename C>
+		void reset(U* pointer, C cloner)
+		{
+			CopiedPtr(pointer, cloner).swap(*this);
 		}
 
 		/// @brief Reset to raw pointer with cloner and deleter
