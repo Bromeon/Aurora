@@ -61,6 +61,20 @@ struct Int
 /// @endcode
 #define AURORA_ENABLE_IF(...)  , typename std::enable_if<__VA_ARGS__>::type* = nullptr
 
+
+/// @brief Macro to ensure complete type
+/// @details Usage:
+/// @code
+///  template <typename T>
+///  void CheckedDelete(T* pointer)
+///  {
+///      AURORA_REQUIRE_COMPLETE_TYPE(T);
+///      delete pointer;
+///  }
+/// @endcode
+/// @hideinitializer
+#define AURORA_REQUIRE_COMPLETE_TYPE(Type) typedef char auroraRequireCompleteType[(sizeof(Type))]
+
 /// @}
 
 // ---------------------------------------------------------------------------------------------------------------------------

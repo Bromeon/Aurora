@@ -29,6 +29,8 @@
 #ifndef AURORA_PTRFUNCTORS_HPP
 #define AURORA_PTRFUNCTORS_HPP
 
+#include <Aurora/Tools/Metaprogramming.hpp>
+
 
 namespace aur
 {
@@ -69,8 +71,7 @@ struct OperatorDelete
 {
 	void operator() (T* pointer)
 	{
-		// Make sure T is complete
-		static_cast<void>(sizeof(T));
+		AURORA_REQUIRE_COMPLETE_TYPE(T);
 		delete pointer;
 	}
 };
