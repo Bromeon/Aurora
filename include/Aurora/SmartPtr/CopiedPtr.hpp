@@ -192,16 +192,6 @@ class CopiedPtr
 			return mPointer;
 		}
 
-		T* release()
-		{
-			mOwner->dismiss();
-
-			T* copy = mPointer;
-
-			reset();
-			return copy;
-		}
-
 		/// @brief Reset to null pointer
 		/// @details If this instance currently holds a pointer, the old deleter is invoked.
 		void reset()

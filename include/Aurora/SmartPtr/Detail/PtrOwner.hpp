@@ -46,9 +46,6 @@ namespace detail
 
 		// Returns the stored pointer
 		virtual T*					getPointer() const = 0;
-		
-		// Deactivates the invocation of the deleter
-		virtual void				dismiss() = 0;
 	};
 
 
@@ -80,11 +77,6 @@ namespace detail
 			return pointer;
 		}
 
-		virtual void dismiss()
-		{
-			pointer = nullptr;
-		}
-
 		U* pointer;
 		C cloner;
 		D deleter;
@@ -112,11 +104,6 @@ namespace detail
 		virtual T* getPointer() const
 		{
 			return base->getPointer();
-		}
-
-		virtual void dismiss()
-		{
-			base->dismiss();
 		}
 
 		PtrOwnerBase<U>* base;
