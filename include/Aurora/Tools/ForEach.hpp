@@ -33,18 +33,34 @@
 /// @{
 
 /// @brief Macro to iterate forward on a mutable sequence.
+/// @details Code example:
+/// @code
+/// std::vector<int> v = createVector();
+/// AURORA_ITR_FOREACH(itr, v)
+/// {
+///     *itr += 2;
+/// }
+/// @endcode
 /// @hideinitializer
-#define AURORA_ITR_FOREACH(ContainerType, containerVar, iteratorVar)			\
-	for (ContainerType::iterator iteratorVar = containerVar.begin(),			\
-	aurForeachEnd = containerVar.end();											\
-	iteratorVar != aurForeachEnd; ++iteratorVar)
+#define AURORA_ITR_FOREACH(iterator, container)		\
+	for (auto iterator = (container).begin(),		\
+	auroraForeachEnd = (container).end();			\
+	iterator != auroraForeachEnd; ++iterator)
 
 /// @brief Macro to iterate forward on a constant sequence.
+/// @details Code example:
+/// @code
+/// const std::vector<int> v = createVector();
+/// AURORA_CITR_FOREACH(itr, v)
+/// {
+///     std::cout << *itr << std::endl;
+/// }
+/// @endcode
 /// @hideinitializer
-#define AURORA_CITR_FOREACH(ContainerType, containerVar, iteratorVar)			\
-	for (ContainerType::const_iterator iteratorVar = containerVar.begin(),		\
-	aurForeachEnd = containerVar.end();											\
-	iteratorVar != aurForeachEnd; ++iteratorVar)
+#define AURORA_CITR_FOREACH(iterator, container)	\
+	for (auto iterator = (container).cbegin(),		\
+	auroraForeachEnd = (container).cend();			\
+	iterator != auroraForeachEnd; ++iterator)
 
 /// @}
 
