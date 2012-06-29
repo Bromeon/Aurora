@@ -62,6 +62,24 @@
 	auroraForeachEnd = (container).cend();			\
 	iterator != auroraForeachEnd; ++iterator)
 
+/// @brief Macro that emulates C++11 range-based for loop.
+/// @details Code example:
+/// @code
+/// std::vector<int> v = createVector();
+/// AURORA_FOREACH(int& i, v)
+/// {
+///     i += 2;
+/// }
+/// @endcode
+/// @hideinitializer
+#define AURORA_FOREACH(declaration, container)																\
+	if (bool auroraBroken = false) {} else																	\
+	for (auto auroraItr = container.begin(); auroraItr != container.end() && !auroraBroken; ++auroraItr)	\
+	if (bool auroraPassed = false) {} else																	\
+	if (auroraBroken = true, false) {} else																	\
+	for (declaration = *auroraItr; !auroraPassed; auroraPassed = true, auroraBroken = false)
+
+
 /// @}
 
 #endif // AURORA_FOREACH_HPP
