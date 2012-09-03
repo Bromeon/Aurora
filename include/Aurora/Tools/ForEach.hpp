@@ -72,11 +72,11 @@
 /// }
 /// @endcode
 /// @hideinitializer
-#define AURORA_FOREACH(declaration, container)																\
-	if (bool auroraBroken = false) {} else																	\
-	for (auto auroraItr = container.begin(); auroraItr != container.end() && !auroraBroken; ++auroraItr)	\
-	if (bool auroraPassed = false) {} else																	\
-	if (auroraBroken = true, false) {} else																	\
+#define AURORA_FOREACH(declaration, container)																	\
+	if (bool auroraBroken = false) {} else																		\
+	for (auto auroraItr = (container).begin(); auroraItr != (container).end() && !auroraBroken; ++auroraItr)	\
+	if (bool auroraPassed = false) {} else																		\
+	if (auroraBroken = true, false) {} else																		\
 	for (declaration = *auroraItr; !auroraPassed; auroraPassed = true, auroraBroken = false)
 
 
