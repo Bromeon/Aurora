@@ -93,7 +93,7 @@ class CopiedPtr;
 #define AURORA_PP_COMMA_UNLESS_ZERO(n) AURORA_PP_COMMA_UNLESS_ZERO_ ## n()
 
 #define AURORA_DETAIL_TYPENAME(n) typename A ## n
-#define AURORA_DETAIL_PARAMETER(n) A ## n ## && arg ## n
+#define AURORA_DETAIL_PARAMETER(n) A ## n && arg ## n
 #define AURORA_DETAIL_FORWARD_ARG(n) std::forward<A ## n>(arg ## n)
 
 #define AURORA_DETAIL_SMARTPTR_FACTORY(SmartPtr, factoryFunction, n)								\
