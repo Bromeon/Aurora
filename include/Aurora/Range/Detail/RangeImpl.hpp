@@ -78,7 +78,8 @@ namespace detail
 	struct IteratorRange;
 
 	template <typename T, typename C, typename Itr>
-	struct IteratorRange<T, C, Traversal::Forward, Itr> : public AbstractRange<T, C>
+	struct IteratorRange<T, C, Traversal::Forward, Itr>
+		: AbstractRange<T, C>
 	{
 		explicit IteratorRange(Itr begin, Itr end)
 		: begin(begin), end(end)
@@ -104,7 +105,8 @@ namespace detail
 	};
 
 	template <typename T, typename C, typename Itr>
-	struct IteratorRange<T, C, Traversal::Bidirectional, Itr> : public IteratorRange<T, C, Traversal::Forward, Itr>
+	struct IteratorRange<T, C, Traversal::Bidirectional, Itr>
+		: IteratorRange<T, C, Traversal::Forward, Itr>
 	{
 		explicit IteratorRange(Itr begin, Itr end)
 		: IteratorRange<T, C, Traversal::Forward, Itr>(begin, end)
@@ -123,13 +125,13 @@ namespace detail
 	};
 
 	template <typename T, typename C, typename Itr>
-	struct IteratorRange<T, C, Traversal::RandomAccess, Itr> : public IteratorRange<T, C, Traversal::Bidirectional, Itr>
+	struct IteratorRange<T, C, Traversal::RandomAccess, Itr>
+		: IteratorRange<T, C, Traversal::Bidirectional, Itr>
 	{
 		explicit IteratorRange(Itr begin, Itr end)
 		: IteratorRange<T, C, Traversal::Bidirectional, Itr>(begin, end)
 		{
 		}
-
 	};
 
 	// ---------------------------------------------------------------------------------------------------------------------------
@@ -158,8 +160,6 @@ namespace detail
 	template <typename T, typename C>
 	struct RangeBase<T, C, Traversal::Forward>
 	{
-		typedef Range<T, C> Derived;
-
 		T& front()
 		{
 			return RangeAccess::getImpl(this).front();
@@ -177,7 +177,8 @@ namespace detail
 	};
 
 	template <typename T, typename C>
-	struct RangeBase<T, C, Traversal::Bidirectional> : RangeBase<T, C, Traversal::Forward>
+	struct RangeBase<T, C, Traversal::Bidirectional>
+		: RangeBase<T, C, Traversal::Forward>
 	{
 		T& back()
 		{
@@ -191,7 +192,8 @@ namespace detail
 	};
 	
 	template <typename T, typename C>
-	struct RangeBase<T, C, Traversal::RandomAccess> : RangeBase<T, C, Traversal::Bidirectional>
+	struct RangeBase<T, C, Traversal::RandomAccess>
+		: RangeBase<T, C, Traversal::Bidirectional>
 	{
 	};
 

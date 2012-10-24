@@ -42,8 +42,10 @@ namespace aurora
 /// @{
 
 /// @brief Type-erased range
-/// @details Type-erased range class with forward iterator category. The iterator type is abstracted; only the element type
-///  needs to be specified.
+/// @details Ranges are generalizations of iterators. Basic ranges can be imagined as (begin,end) iterator pairs, however
+///  they allow much more. Like at iterators, ranges work on traversal categories which determine how a sequence can be traversed.
+/// @n@n This class implements a <i>type-erased</i> range. This means that the underlying iterator types are abstracted.
+/// Only the iterator's value type (also called element type) is relevant. 
 /// @tparam T Element type. Can be const-qualified to prevent changes of the elements.
 /// @tparam C Iterator category. Must be one of the categories in namespace aurora::Traversal.
 template <typename T, typename C>
@@ -61,10 +63,10 @@ class Range : public detail::RangeBase<T, C, C>
 	// Public member functions
 	public:
 		/// @brief Construct from iterator interval [begin, end[
-		///
+		/// @details The iterator category must not be weaker than the range traversal category of @a this.
 		template <typename Itr>
 		explicit Range(Itr begin, Itr end)
-		: mRange(new detail::IteratorRange<T, C, C, Itr>(begin, end))
+		: mRange(new detail::IteratorRange<ElementType, C, C, Itr>(begin, end))
 		{
 			typedef typename std::iterator_traits<Itr>::iterator_category Category;
 			static_assert( std::is_convertible<Category, C>::value, "Category of passed iterators too low." );
@@ -95,8 +97,8 @@ class Range : public detail::RangeBase<T, C, C>
 			return *this;
 		}
 
-		/// @brief Construct from different range (to add const)
-		/// @details Can be used to add const qualifiers or to weaken the traversal category
+		/// @brief Assign from different range
+		/// @details Can be used to add const qualifiers or to weaken the traversal category.
 		template <typename T2, typename C2>
 		Range& operator= (Range<T2, C2> origin)
 		{
