@@ -70,25 +70,40 @@ class Range : public detail::RangeBase<T, C, C>
 			static_assert( std::is_convertible<Category, C>::value, "Category of passed iterators too low." );
 		}
 
+		/// @brief Move constructor
+		/// 
+		Range(Range&& source)
+		: mRange(std::move(source.mRange))
+		{
+		}
+
 		/// @brief Construct from different range
 		/// @details Can be used to add const qualifiers or to weaken the traversal category.
 		template <typename T2, typename C2>
-		Range(const Range<T2, C2>& origin)
-		: mRange(origin.mRange)
+		Range(Range<T2, C2> origin)
+		: mRange(std::move(origin.mRange))
 		{
 			static_assert( std::is_convertible<T2, T>::value, "Range element types incompatible." );
 			static_assert( std::is_convertible<C2, C>::value, "Iterator categories incompatible." );
 		}
 
+		/// @brief Move assignment operator
+		/// 
+		Range& operator= (Range&& source)
+		{
+			mRange = std::move(source.mRange);
+			return *this;
+		}
+
 		/// @brief Construct from different range (to add const)
 		/// @details Can be used to add const qualifiers or to weaken the traversal category
 		template <typename T2, typename C2>
-		Range& operator= (const Range<T2, C2>& origin)
+		Range& operator= (Range<T2, C2> origin)
 		{
 			static_assert( std::is_convertible<T2, T>::value, "Range element types incompatible." );
 			static_assert( std::is_convertible<C2, C>::value, "Iterator categories incompatible." );
 
-			mRange = origin.mRange;
+			mRange = std::move(origin.mRange);
 			return *this;
 		}
 
