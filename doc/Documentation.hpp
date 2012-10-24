@@ -41,3 +41,6 @@
 
 /// @defgroup Tools Tools
 /// @brief Reusable C++ utility features, such as noncopyable base classes, foreach macros or a std::type_info wrapper.
+
+/// @defgroup Range Range
+/// @brief Type-erased ranges, a generic abstraction from iterator interfaces.
