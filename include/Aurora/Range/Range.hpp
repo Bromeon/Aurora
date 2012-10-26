@@ -73,6 +73,13 @@ class Range : public detail::RangeBase<T, C, C>
 			static_assert( std::is_convertible<Category, C>::value, "Category of passed iterators too low." );
 		}
 
+		/// @brief Copy constructor
+		/// 
+		Range(const Range& origin)
+		: mRange(origin.mRange)
+		{
+		}
+
 		/// @brief Move constructor
 		/// 
 		Range(Range&& source)
@@ -88,6 +95,14 @@ class Range : public detail::RangeBase<T, C, C>
 		{
 			static_assert( std::is_convertible<T2, T>::value, "Range element types incompatible." );
 			static_assert( std::is_convertible<C2, C>::value, "Iterator categories incompatible." );
+		}
+
+		/// @brief Copy assignment operator
+		/// 
+		Range& operator= (const Range& origin)
+		{
+			mRange = origin.mRange;
+			return *this;
 		}
 
 		/// @brief Move assignment operator
@@ -108,6 +123,13 @@ class Range : public detail::RangeBase<T, C, C>
 
 			mRange = std::move(origin.mRange);
 			return *this;
+		}
+
+		/// @brief Swaps the range with another range of the same type.
+		/// 
+		void swap(Range& other)
+		{
+			aurora::swap(mRange, other.mRange);
 		}
 
 
@@ -161,6 +183,14 @@ class Range : public detail::RangeBase<T, C, C>
 
 	friend struct detail::RangeAccess;
 };
+
+/// @relates Range
+/// @brief Swaps two ranges.
+template <typename T, typename C>
+void swap(Range<T, C>& lhs, Range<T, C>& rhs)
+{
+	lhs.swap(rhs);
+}
 
 /// @}
 
