@@ -108,6 +108,8 @@ namespace detail
 	struct IteratorRange<T, C, Traversal::Bidirectional, Itr>
 		: IteratorRange<T, C, Traversal::Forward, Itr>
 	{
+		// Note: this-> required to make name dependent
+
 		explicit IteratorRange(Itr begin, Itr end)
 		: IteratorRange<T, C, Traversal::Forward, Itr>(begin, end)
 		{
@@ -115,12 +117,12 @@ namespace detail
 
 		virtual T& back()
 		{
-			return *std::prev(end);
+			return *std::prev(this->end);
 		}
 
 		virtual void popBack()
 		{
-			--end;
+			--this->end;
 		}
 	};
 
@@ -154,6 +156,12 @@ namespace detail
 		static const AbstractRange<typename std::remove_const<T>::type, C>& getImpl(const RangeBase<T, C, C2>* object)
 		{
 			return *static_cast<const Range<T, C>*>(object)->mRange;
+		}
+
+		template <typename T, typename C>
+		static CopiedPtr<AbstractRange<typename std::remove_const<T>::type, C>>& getPtr(Range<T, C>& object)
+		{
+			return object.mRange;
 		}
 	};
 

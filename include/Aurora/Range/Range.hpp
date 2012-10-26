@@ -31,6 +31,7 @@
 
 #include <Aurora/Range/Detail/RangeImpl.hpp>
 #include <Aurora/SmartPtr/CopiedPtr.hpp>
+#include <Aurora/Tools/Metaprogramming.hpp>
 
 #include <type_traits>
 
@@ -107,6 +108,17 @@ class Range : public detail::RangeBase<T, C, C>
 
 			mRange = std::move(origin.mRange);
 			return *this;
+		}
+
+
+	// ---------------------------------------------------------------------------------------------------------------------------
+	// Implementation details
+	public:
+		// Construct from backend base class
+		template <class RangeImpl>
+		explicit Range(Type<detail::RangeAccess>, RangeImpl* newImpl)
+		: mRange(newImpl)
+		{
 		}
 
 
