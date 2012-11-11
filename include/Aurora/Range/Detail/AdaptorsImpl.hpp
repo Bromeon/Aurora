@@ -57,6 +57,15 @@ namespace detail
 		>::iterator_category type;
 	};
 
+	// Container value type
+	template <typename Container>
+	struct ContainerValue
+	{
+		typedef typename std::remove_reference<
+			typename Container::reference
+		>::type type;
+	};
+
 	// Concrete backend type for chained ranges
 	template <typename T, typename C, typename SpecializedC>
 	struct ChainedRange;

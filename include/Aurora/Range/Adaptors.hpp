@@ -62,9 +62,9 @@ Range<T, typename detail::WeakerCategory<C1, C2>::type> chain(Range<T, C1> lhs, 
 ///  container become invalid (as a result of inserting/removing elements). The value type and traversal category of the
 ///  returned range correspond to those of the container.
 template <typename Container>
-Range<typename Container::value_type, typename detail::ContainerCategory<Container>::type> makeRange(Container& c)
+Range<typename detail::ContainerValue<Container>::type, typename detail::ContainerCategory<Container>::type> makeRange(Container& c)
 {
-	typedef typename Container::value_type T;
+	typedef typename detail::ContainerValue<Container>::type T;
 	typedef typename detail::ContainerCategory<Container>::type C;
 	static_assert(std::is_convertible<C, Traversal::Forward>::value, "Container must support forward iterators");
 
