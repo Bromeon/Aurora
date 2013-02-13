@@ -38,4 +38,12 @@
 // Mislead doxygen to keep documentation clean from internals
 #define AURORA_FAKE_DOC(real, fake) real
 
+
+// Output useful error message if MSVC or g++ compilers do not support C++11
+#if defined(_MSC_VER) && _MSC_VER < 1600
+	#error At least Visual Studio 2010 is required.
+#elif defined(__GNUG__) && 100*__GNUC__ + __GNUC_MINOR__ < 406
+	#error At least g++ 4.6 is required.
+#endif
+
 #endif // AURORA_CONFIG_HPP
