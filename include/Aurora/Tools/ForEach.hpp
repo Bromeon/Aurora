@@ -29,6 +29,13 @@
 #ifndef AURORA_FOREACH_HPP
 #define AURORA_FOREACH_HPP
 
+// Preprocessor metaprogramming to ensure line-unique identifiers
+#define AURORA_PP_CAT_IMPL(a, b) a ## b
+#define AURORA_PP_CAT(a, b) AURORA_PP_CAT_IMPL(a, b)
+#define AURORA_ID(identifier) AURORA_PP_CAT(auroraDetail_, identifier)
+#define AURORA_LINE_ID(identifier) AURORA_PP_CAT(AURORA_ID(identifier), __LINE__)
+
+
 /// @addtogroup Tools
 /// @{
 
@@ -72,12 +79,12 @@
 /// }
 /// @endcode
 /// @hideinitializer
-#define AURORA_FOREACH(declaration, container)																	\
-	if (bool auroraBroken = false) {} else																		\
-	for (auto auroraItr = (container).begin(); auroraItr != (container).end() && !auroraBroken; ++auroraItr)	\
-	if (bool auroraPassed = false) {} else																		\
-	if (auroraBroken = true, false) {} else																		\
-	for (declaration = *auroraItr; !auroraPassed; auroraPassed = true, auroraBroken = false)
+#define AURORA_FOREACH(declaration, container)																											\
+	if (bool AURORA_LINE_ID(broken) = false) {} else																									\
+	for (auto AURORA_LINE_ID(itr) = (container).begin(); AURORA_LINE_ID(itr) != (container).end() && !AURORA_LINE_ID(broken); ++AURORA_LINE_ID(itr))	\
+	if (bool AURORA_LINE_ID(passed) = false) {} else																									\
+	if (AURORA_LINE_ID(broken) = true, false) {} else																									\
+	for (declaration = *AURORA_LINE_ID(itr); !AURORA_LINE_ID(passed); AURORA_LINE_ID(passed) = true, AURORA_LINE_ID(broken) = false)
 
 
 /// @}
