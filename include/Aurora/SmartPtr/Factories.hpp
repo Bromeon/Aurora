@@ -29,6 +29,8 @@
 #ifndef AURORA_FACTORIES_HPP
 #define AURORA_FACTORIES_HPP
 
+#include <Aurora/Tools/Preprocessor.hpp>
+
 #include <memory>	// std::unique_ptr
 #include <utility>	// std::forward()
 
@@ -74,23 +76,6 @@ CopiedPtr<T> makeCopied(Args... args);
 
 template <typename T>
 class CopiedPtr;
-
-// Some preprocessor metaprogramming (shows how much I hate boilerplate code)
-#define AURORA_PP_LIST_0(macro)
-#define AURORA_PP_LIST_1(macro) macro(1)
-#define AURORA_PP_LIST_2(macro) AURORA_PP_LIST_1(macro), macro(2)
-#define AURORA_PP_LIST_3(macro) AURORA_PP_LIST_2(macro), macro(3)
-#define AURORA_PP_LIST_4(macro) AURORA_PP_LIST_3(macro), macro(4)
-#define AURORA_PP_LIST_5(macro) AURORA_PP_LIST_4(macro), macro(5)
-#define AURORA_PP_LIST(n, macro) AURORA_PP_LIST_ ## n(macro)
-
-#define AURORA_PP_COMMA_UNLESS_ZERO_0()
-#define AURORA_PP_COMMA_UNLESS_ZERO_1() ,
-#define AURORA_PP_COMMA_UNLESS_ZERO_2() ,
-#define AURORA_PP_COMMA_UNLESS_ZERO_3() ,
-#define AURORA_PP_COMMA_UNLESS_ZERO_4() ,
-#define AURORA_PP_COMMA_UNLESS_ZERO_5() ,
-#define AURORA_PP_COMMA_UNLESS_ZERO(n) AURORA_PP_COMMA_UNLESS_ZERO_ ## n()
 
 #define AURORA_DETAIL_TYPENAME(n) typename A ## n
 #define AURORA_DETAIL_PARAMETER(n) A ## n && arg ## n

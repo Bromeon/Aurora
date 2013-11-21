@@ -23,6 +23,9 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+/// @file
+/// @brief Utilities for template metaprogramming
+
 #ifndef AURORA_METAPROGRAMMING_HPP
 #define AURORA_METAPROGRAMMING_HPP
 

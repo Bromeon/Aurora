@@ -29,9 +29,10 @@
 #ifndef AURORA_FOREACH_HPP
 #define AURORA_FOREACH_HPP
 
+#include <Aurora/Tools/Preprocessor.hpp>
+
+
 // Preprocessor metaprogramming to ensure line-unique identifiers
-#define AURORA_PP_CAT_IMPL(a, b) a ## b
-#define AURORA_PP_CAT(a, b) AURORA_PP_CAT_IMPL(a, b)
 #define AURORA_ID(identifier) AURORA_PP_CAT(auroraDetail_, identifier)
 #define AURORA_LINE_ID(identifier) AURORA_PP_CAT(AURORA_ID(identifier), __LINE__)
 
