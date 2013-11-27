@@ -94,8 +94,16 @@ struct DispatchTraits
 
 	/// @brief Maps a function to itself (no trampoline needed)
 	/// 
-	template <typename UnusedK, typename Fn>
+	template <typename UnusedId, typename Fn>
 	static Fn trampoline1(Fn f)
+	{
+		return f;
+	}
+
+	/// @brief Maps a function to itself (no trampoline needed)
+	/// 
+	template <typename UnusedId1, typename UnusedId2, typename Fn>
+	static Fn trampoline2(Fn f)
 	{
 		return f;
 	}
@@ -138,15 +146,26 @@ struct RttiDispatchTraits
 
 	/// @brief Wraps a function such that the argument is downcast before being passed
 	/// 
-	template <typename K, typename Fn>
+	template <typename Id, typename Fn>
 	static std::function<R(B)> trampoline1(Fn f)
 	{
-		typedef typename K::type Derived;
-
 		return [f] (B arg) mutable -> R
 		{
-			typedef AURORA_REPLICATE(B, typename K::type) Derived;
+			typedef AURORA_REPLICATE(B, typename Id::type) Derived;
 			return f(static_cast<Derived>(arg));
+		};
+	}
+
+	/// @brief Wraps a function such that both arguments are downcast before being passed
+	/// 
+	template <typename Id1, typename Id2, typename Fn>
+	static std::function<R(B, B)> trampoline2(Fn f)
+	{
+		return [f] (B arg1, B arg2) mutable -> R
+		{
+			typedef AURORA_REPLICATE(B, typename Id1::type) Derived1;
+			typedef AURORA_REPLICATE(B, typename Id2::type) Derived2;
+			return f(static_cast<Derived1>(arg1), static_cast<Derived2>(arg2));
 		};
 	}
 
