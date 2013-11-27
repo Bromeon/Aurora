@@ -45,6 +45,7 @@ namespace aurora
 template <typename T>
 struct Type
 {
+	typedef T type;
 };
 
 /// @brief Simple integer wrapper, can be used for overload resolution.
@@ -52,6 +53,7 @@ struct Type
 template <int N>
 struct Int
 {
+	static const int value = N;
 };
 
 
