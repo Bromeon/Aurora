@@ -29,6 +29,8 @@
 #ifndef AURORA_HASH_HPP
 #define AURORA_HASH_HPP
 
+#include <Aurora/Tools/Metaprogramming.hpp>
+
 #include <functional>
 
 
@@ -41,10 +43,19 @@ namespace aurora
 /// @brief Computes the hash value of an object (short-hand notation).
 ///
 template <typename T>
-std::size_t hashValue(const T& object)
+std::size_t hashValue(const T& object
+	AURORA_ENABLE_IF(!std::is_enum<T>::value))
 {
 	std::hash<T> hasher;
 	return hasher(object);
+}
+
+// Overload for enums
+template <typename T>
+std::size_t hashValue(const T& enumerator
+	AURORA_ENABLE_IF(std::is_enum<T>::value))
+{
+	return hashValue(static_cast<typename std::underlying_type<T>::type>(enumerator));
 }
 
 /// @brief Combines a hash with the hash value of another object.
@@ -53,8 +64,7 @@ template <typename T>
 void hashCombine(std::size_t& seed, const T& object)
 {
 	// Implementation from Boost.Functional/Hash
-    std::hash<T> hasher;
-	seed ^= hasher(object) + 0x9e3779b9u + (seed << 6) + (seed >> 2);
+	seed ^= hashValue(object) + 0x9e3779b9u + (seed << 6) + (seed >> 2);
 }
 
 /// @brief Combines a hash with the hash value of a range of objects.
