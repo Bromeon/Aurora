@@ -50,13 +50,17 @@ R DoubleDispatcher<B, R, Traits>::call(B arg1, B arg2) const
 	SingleKey key2 = Traits::keyFromBase(arg2);
 
 	// If no corresponding class (or base class) has been found, throw exception
-	auto itr = mMap.find(makeKey(key1, key2));
+	Key key = makeKey(key1, key2);
+	auto itr = mMap.find(key);
 	if (itr == mMap.end())
 		throw FunctionCallException(std::string("DoubleDispatcher::call() - function with parameters \"") + Traits::name(key1)
 		+ "\" and \"" + Traits::name(key2) + "\" not registered");
 
-	// Otherwise, call dispatched function
-	return itr->second(arg1, arg2);
+	// Call function (swap-flag equal for stored entry and passed arguments means the order was the same; otherwise swap arguments)
+	if (itr->first.swapped == key.swapped)
+		return itr->second(arg1, arg2);
+	else
+		return itr->second(arg2, arg1);
 }
 
 template <class B, typename R, class Traits>
@@ -64,9 +68,29 @@ typename DoubleDispatcher<B, R, Traits>::Key DoubleDispatcher<B, R, Traits>::mak
 {
 	// When symmetric, (key1,key2) and (key2,key1) are the same -> sort so that we always have (key1,key2)
 	if (mSymmetric && hashValue(key2) < hashValue(key1))
-		std::swap(key1, key2);
+		return Key(key2, key1, true);
+	else
+		return Key(key1, key2, false);
+}
 
-	return Key(key1, key2);
+template <class B, typename R, class Traits>
+DoubleDispatcher<B, R, Traits>::Key::Key(const SingleKey& key1, const SingleKey& key2, bool swapped)
+: keyPair(key1, key2)
+, swapped(swapped)
+{
+}
+
+template <class B, typename R, class Traits>
+bool DoubleDispatcher<B, R, Traits>::Key::operator== (const Key& rhs) const
+{
+	// Member 'swapped' not relevant for key lookup
+	return keyPair == rhs.keyPair;
+}
+
+template <class B, typename R, class Traits>
+std::size_t DoubleDispatcher<B, R, Traits>::Hasher::operator() (const Key& k) const
+{
+	return PairHasher()(k.keyPair);
 }
 
 } // namespace aurora

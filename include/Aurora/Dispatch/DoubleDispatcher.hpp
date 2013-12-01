@@ -153,9 +153,23 @@ class DoubleDispatcher : private NonCopyable
 	// Private types
 	private:
 		typedef typename Traits::Key								SingleKey;
-		typedef std::pair<SingleKey, SingleKey>						Key;
 		typedef std::function<R(B, B)>								BaseFunction;
-		typedef std::unordered_map<Key, BaseFunction, PairHasher>	FnMap;
+
+		struct Key
+		{
+											Key(const SingleKey& key1, const SingleKey& key2, bool swapped);
+			bool							operator== (const Key& rhs) const;
+
+			std::pair<SingleKey, SingleKey>	keyPair;
+			bool							swapped;
+		};
+
+		struct Hasher
+		{
+			std::size_t operator() (const Key& k) const;
+		};
+
+		typedef std::unordered_map<Key, BaseFunction, Hasher>		FnMap;
 
 
 	// ---------------------------------------------------------------------------------------------------------------------------
