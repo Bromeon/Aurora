@@ -81,16 +81,16 @@ class CopiedPtr;
 #define AURORA_DETAIL_PARAMETER(n) A ## n && arg ## n
 #define AURORA_DETAIL_FORWARD_ARG(n) std::forward<A ## n>(arg ## n)
 
-#define AURORA_DETAIL_SMARTPTR_FACTORY(SmartPtr, factoryFunction, n)								\
-	template <typename T AURORA_PP_COMMA_UNLESS_ZERO(n) AURORA_PP_LIST(n, AURORA_DETAIL_TYPENAME)>	\
-	SmartPtr<T> factoryFunction(AURORA_PP_LIST(n, AURORA_DETAIL_PARAMETER))							\
-	{																								\
-		return SmartPtr<T>(new T( AURORA_PP_LIST(n, AURORA_DETAIL_FORWARD_ARG) ));					\
+#define AURORA_DETAIL_SMARTPTR_FACTORY(SmartPtr, factoryFunction, n)											\
+	template <typename T AURORA_PP_COMMA_UNLESS_ZERO(n) AURORA_PP_ENUMERATE_COMMA(n, AURORA_DETAIL_TYPENAME)>	\
+	SmartPtr<T> factoryFunction(AURORA_PP_ENUMERATE_COMMA(n, AURORA_DETAIL_PARAMETER))							\
+	{																											\
+		return SmartPtr<T>(new T( AURORA_PP_ENUMERATE_COMMA(n, AURORA_DETAIL_FORWARD_ARG) ));					\
 	}
 
 
 // Actual function template overloads
-// Note: I can't apply AURORA_PP_LIST here because nested macros with the same name are not expanded
+// Note: I can't apply AURORA_PP_ENUMERATE here because nested macros with the same name are not expanded
 AURORA_DETAIL_SMARTPTR_FACTORY(std::unique_ptr, makeUnique, 0)
 AURORA_DETAIL_SMARTPTR_FACTORY(std::unique_ptr, makeUnique, 1)
 AURORA_DETAIL_SMARTPTR_FACTORY(std::unique_ptr, makeUnique, 2)

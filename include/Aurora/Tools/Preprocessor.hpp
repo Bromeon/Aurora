@@ -44,14 +44,24 @@
 #define AURORA_PP_STRINGIZE(a)			AURORA_PP_STRINGIZE_IMPL(a)
 
 
-// Apply macro repeated times
-#define AURORA_PP_LIST_0(macro)
-#define AURORA_PP_LIST_1(macro)			macro(1)
-#define AURORA_PP_LIST_2(macro)			AURORA_PP_LIST_1(macro), macro(2)
-#define AURORA_PP_LIST_3(macro)			AURORA_PP_LIST_2(macro), macro(3)
-#define AURORA_PP_LIST_4(macro)			AURORA_PP_LIST_3(macro), macro(4)
-#define AURORA_PP_LIST_5(macro)			AURORA_PP_LIST_4(macro), macro(5)
-#define AURORA_PP_LIST(n, macro)		AURORA_PP_LIST_ ## n(macro)
+// Apply macro repeated times, counting from 0 to n
+#define AURORA_PP_ENUMERATE_0(macro)
+#define AURORA_PP_ENUMERATE_1(macro)			macro(1)
+#define AURORA_PP_ENUMERATE_2(macro)			AURORA_PP_ENUMERATE_1(macro) macro(2)
+#define AURORA_PP_ENUMERATE_3(macro)			AURORA_PP_ENUMERATE_2(macro) macro(3)
+#define AURORA_PP_ENUMERATE_4(macro)			AURORA_PP_ENUMERATE_3(macro) macro(4)
+#define AURORA_PP_ENUMERATE_5(macro)			AURORA_PP_ENUMERATE_4(macro) macro(5)
+#define AURORA_PP_ENUMERATE(n, macro)			AURORA_PP_ENUMERATE_ ## n(macro)
+
+
+// Apply macro repeated times, counting from 0 to n and using a comma separator
+#define AURORA_PP_ENUMERATE_COMMA_0(macro)
+#define AURORA_PP_ENUMERATE_COMMA_1(macro)		macro(1)
+#define AURORA_PP_ENUMERATE_COMMA_2(macro)		AURORA_PP_ENUMERATE_COMMA_1(macro), macro(2)
+#define AURORA_PP_ENUMERATE_COMMA_3(macro)		AURORA_PP_ENUMERATE_COMMA_2(macro), macro(3)
+#define AURORA_PP_ENUMERATE_COMMA_4(macro)		AURORA_PP_ENUMERATE_COMMA_3(macro), macro(4)
+#define AURORA_PP_ENUMERATE_COMMA_5(macro)		AURORA_PP_ENUMERATE_COMMA_4(macro), macro(5)
+#define AURORA_PP_ENUMERATE_COMMA(n, macro)		AURORA_PP_ENUMERATE_COMMA_ ## n(macro)
 
 
 // Put a comma, if the argument is not zero
