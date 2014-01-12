@@ -51,6 +51,20 @@
 #define AURORA_PP_STRINGIZE(a)			AURORA_PP_STRINGIZE_IMPL(a)
 
 
+// Macro that can be passed to other macros and evaluates to empty space
+#define AURORA_PP_UNUSED
+
+
+// Conditional evaluation
+#define AURORA_PP_IF_0(trueCase, falseCase)				falseCase
+#define AURORA_PP_IF_1(trueCase, falseCase)				trueCase
+#define AURORA_PP_IF_2(trueCase, falseCase)				trueCase
+#define AURORA_PP_IF_3(trueCase, falseCase)				trueCase
+#define AURORA_PP_IF_4(trueCase, falseCase)				trueCase
+#define AURORA_PP_IF_5(trueCase, falseCase)				trueCase
+#define AURORA_PP_IF(condition, trueCase, falseCase)	AURORA_PP_IF_ ## condition(trueCase, falseCase)
+
+
 // Apply macro repeated times, counting from 0 to n
 #define AURORA_PP_ENUMERATE_0(macro)
 #define AURORA_PP_ENUMERATE_1(macro)			                             macro(1)
@@ -109,5 +123,15 @@
 #define AURORA_PP_FOREACH_5(macro, size, tuple)		AURORA_PP_FOREACH_4(macro, size, tuple) macro(AURORA_PP_AT(size, 4, tuple), 4)
 
 #define AURORA_PP_FOREACH(macro, size, tuple)		AURORA_PP_CAT(AURORA_PP_FOREACH_, size) (macro, size, tuple)
+
+
+// Iterate over tuple, passing additional data to each macro. macro is MACRO(value, index, data)
+#define AURORA_PP_FOREACH_DATA_1(macro, size, tuple, data)	                                                   macro(AURORA_PP_AT(size, 0, tuple), 0, data)
+#define AURORA_PP_FOREACH_DATA_2(macro, size, tuple, data)	AURORA_PP_FOREACH_DATA_1(macro, size, tuple, data) macro(AURORA_PP_AT(size, 1, tuple), 1, data)
+#define AURORA_PP_FOREACH_DATA_3(macro, size, tuple, data)	AURORA_PP_FOREACH_DATA_2(macro, size, tuple, data) macro(AURORA_PP_AT(size, 2, tuple), 2, data)
+#define AURORA_PP_FOREACH_DATA_4(macro, size, tuple, data)	AURORA_PP_FOREACH_DATA_3(macro, size, tuple, data) macro(AURORA_PP_AT(size, 3, tuple), 3, data)
+#define AURORA_PP_FOREACH_DATA_5(macro, size, tuple, data)	AURORA_PP_FOREACH_DATA_4(macro, size, tuple, data) macro(AURORA_PP_AT(size, 4, tuple), 4, data)
+
+#define AURORA_PP_FOREACH_DATA(macro, size, tuple, data)	CAT(AURORA_PP_FOREACH_DATA_, size) (macro, size, tuple, data)
 
 #endif // AURORA_PREPROCESSOR_HPP
