@@ -31,6 +31,8 @@
 
 #include <Aurora/Tools/Preprocessor.hpp>
 
+#include <tuple>
+
 
 /// @addtogroup Tools
 /// @{
@@ -53,6 +55,23 @@
 #define AURORA_DETAIL_MEMDECL_P(pair)			AURORA_DETAIL_MEMDECL_TV pair
 #define AURORA_DETAIL_MEMDECL(pair, index)		AURORA_DETAIL_MEMDECL_P(pair)
 
+// Variable passed as argument for std::make_tuple()
+#define AURORA_DETAIL_VAR_TV(Type, var)			var
+#define AURORA_DETAIL_VAR_P(pair)				AURORA_DETAIL_VAR_TV pair
+#define AURORA_DETAIL_VAR(pair, index)			AURORA_PP_COMMA_IF(index) AURORA_DETAIL_VAR_P(pair) 
+
+// Type passed as template argument for std::tuple
+#define AURORA_DETAIL_TYPE_TV(Type, var)		Type
+#define AURORA_DETAIL_TYPE_P(pair)				AURORA_DETAIL_TYPE_TV pair
+#define AURORA_DETAIL_TYPE(pair, index)			AURORA_PP_COMMA_IF(index) AURORA_DETAIL_TYPE_P(pair) 
+
+
+#define AURORA_DETAIL_TOSTDTUPLE(size, typeVarPairs)										\
+std::tuple<AURORA_PP_FOREACH(AURORA_DETAIL_TYPE, size, typeVarPairs)> toStdTuple() const	\
+{																							\
+	return std::make_tuple(AURORA_PP_FOREACH(AURORA_DETAIL_VAR, size, typeVarPairs));		\
+}																							\
+
 /// @brief Named tuple definition
 /// @details Defines a struct type with a specified list of public members and a corresponding constructor.
 /// @param TupleName Name of the struct
@@ -68,6 +87,7 @@ struct TupleName																		\
 	}																					\
 																						\
 	AURORA_PP_FOREACH(AURORA_DETAIL_MEMDECL, size, typeVarPairs)						\
+	AURORA_DETAIL_TOSTDTUPLE(size, typeVarPairs)										\
 };																						\
 
 /// @}
