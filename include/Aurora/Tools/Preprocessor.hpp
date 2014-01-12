@@ -116,6 +116,7 @@
 
 
 // Iterate over tuple, apply each macro once. macro is MACRO(value, index)
+#define AURORA_PP_FOREACH_0(macro, size, tuple)
 #define AURORA_PP_FOREACH_1(macro, size, tuple)		                                        macro(AURORA_PP_AT(size, 0, tuple), 0)
 #define AURORA_PP_FOREACH_2(macro, size, tuple)		AURORA_PP_FOREACH_1(macro, size, tuple) macro(AURORA_PP_AT(size, 1, tuple), 1)
 #define AURORA_PP_FOREACH_3(macro, size, tuple)		AURORA_PP_FOREACH_2(macro, size, tuple) macro(AURORA_PP_AT(size, 2, tuple), 2)
@@ -126,6 +127,7 @@
 
 
 // Iterate over tuple, passing additional data to each macro. macro is MACRO(value, index, data)
+#define AURORA_PP_FOREACH_DATA_0(macro, size, tuple, data)
 #define AURORA_PP_FOREACH_DATA_1(macro, size, tuple, data)	                                                   macro(AURORA_PP_AT(size, 0, tuple), 0, data)
 #define AURORA_PP_FOREACH_DATA_2(macro, size, tuple, data)	AURORA_PP_FOREACH_DATA_1(macro, size, tuple, data) macro(AURORA_PP_AT(size, 1, tuple), 1, data)
 #define AURORA_PP_FOREACH_DATA_3(macro, size, tuple, data)	AURORA_PP_FOREACH_DATA_2(macro, size, tuple, data) macro(AURORA_PP_AT(size, 2, tuple), 2, data)
