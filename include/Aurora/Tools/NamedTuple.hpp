@@ -29,9 +29,8 @@
 #ifndef AURORA_NAMEDTUPLE_HPP
 #define AURORA_NAMEDTUPLE_HPP
 
+#include <Aurora/Tools/Preprocessor.hpp>
 
-namespace aurora
-{
 
 /// @addtogroup Tools
 /// @{
@@ -39,65 +38,38 @@ namespace aurora
 // Note: Inconsistent syntax "T const&" instead of "const T&" because T is not a real type, only text replacement
 // Thus, the former leads to problems in cases like pointers
 
-/// @brief Named tuple with 2 members
-/// @details Defines a struct called @a Tuple, with two members as specified in the macro and a constructor
-///  taking an argument for each member.
-/// @hideinitializer
-#define AURORA_NAMED_TUPLE2(Tuple, Type1, member1, Type2, member2)	\
-struct Tuple														\
-{																	\
-	explicit Tuple(Type1 const& arg1, Type2 const& arg2)			\
-	: member1(arg1)													\
-	, member2(arg2)													\
-	{																\
-	}																\
-																	\
-	Type1 member1;													\
-	Type2 member2;													\
-};
-	
-/// @brief Named tuple with 3 members
-/// @details Defines a struct called @a Tuple, with three members as specified in the macro and a constructor
-///  taking an argument for each member.
-/// @hideinitializer
-#define AURORA_NAMED_TUPLE3(Tuple, Type1, member1, Type2, member2, Type3, member3)	\
-struct Tuple																		\
-{																					\
-	explicit Tuple(Type1 const& arg1, Type2 const& arg2, Type3 const& arg3)			\
-	: member1(arg1)																	\
-	, member2(arg2)																	\
-	, member3(arg3)																	\
-	{																				\
-	}																				\
-																					\
-	Type1 member1;																	\
-	Type2 member2;																	\
-	Type3 member3;																	\
-};
+// Constructor parameter
+#define AURORA_DETAIL_PARAM_TV(Type, var)		Type const& var
+#define AURORA_DETAIL_PARAM_P(pair)				AURORA_DETAIL_PARAM_TV pair
+#define AURORA_DETAIL_PARAM(pair, index)		AURORA_PP_COMMA_IF(index) AURORA_DETAIL_PARAM_P(pair) 
 
-/// @brief Named tuple with 4 members
-/// @details Defines a struct called @a Tuple, with four members as specified in the macro and a constructor
-///  taking an argument for each member.
+// Constructor initialization list
+#define AURORA_DETAIL_INIT_TV(Type, var)		var(var)
+#define AURORA_DETAIL_INIT_P(pair)				AURORA_DETAIL_INIT_TV pair
+#define AURORA_DETAIL_INIT(pair, index)			AURORA_PP_COMMA_IF(index) AURORA_DETAIL_INIT_P(pair)
+
+// Member variable declaration
+#define AURORA_DETAIL_MEMDECL_TV(Type, var)		Type var;
+#define AURORA_DETAIL_MEMDECL_P(pair)			AURORA_DETAIL_MEMDECL_TV pair
+#define AURORA_DETAIL_MEMDECL(pair, index)		AURORA_DETAIL_MEMDECL_P(pair)
+
+/// @brief Named tuple definition
+/// @details Defines a struct type with a specified list of public members and a corresponding constructor.
+/// @param TupleName Name of the struct
+/// @param size Number of member variables
+/// @param typeVarPairs Parenthesized sequence of (Type, variable) pairs, such as ((int, i), (double, d))
 /// @hideinitializer
-#define AURORA_NAMED_TUPLE4(Tuple, Type1, member1, Type2, member2, Type3, member3, Type4, member4)	\
-struct Tuple																						\
-{																									\
-	explicit Tuple(Type1 const& arg1, Type2 const& arg2, Type3 const& arg3, Type4 const& arg4)		\
-	: member1(arg1)																					\
-	, member2(arg2)																					\
-	, member3(arg3)																					\
-	, member4(arg4)																					\
-	{																								\
-	}																								\
-																									\
-	Type1 member1;																					\
-	Type2 member2;																					\
-	Type3 member3;																					\
-	Type4 member4;																					\
-};
+#define AURORA_NAMED_TUPLE(TupleName, size, typeVarPairs)								\
+struct TupleName																		\
+{																						\
+	explicit TupleName(AURORA_PP_FOREACH(AURORA_DETAIL_PARAM, size, typeVarPairs))		\
+	: AURORA_PP_FOREACH(AURORA_DETAIL_INIT, size, typeVarPairs)							\
+	{																					\
+	}																					\
+																						\
+	AURORA_PP_FOREACH(AURORA_DETAIL_MEMDECL, size, typeVarPairs)						\
+};																						\
 
 /// @}
-
-} // namespace aurora
-
+	
 #endif // AURORA_NAMEDTUPLE_HPP
