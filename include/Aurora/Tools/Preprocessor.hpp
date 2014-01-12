@@ -65,13 +65,13 @@
 
 
 // Put a comma, if the argument is not zero
-#define AURORA_PP_COMMA_UNLESS_ZERO_0()
-#define AURORA_PP_COMMA_UNLESS_ZERO_1()	,
-#define AURORA_PP_COMMA_UNLESS_ZERO_2()	,
-#define AURORA_PP_COMMA_UNLESS_ZERO_3()	,
-#define AURORA_PP_COMMA_UNLESS_ZERO_4()	,
-#define AURORA_PP_COMMA_UNLESS_ZERO_5()	,
-#define AURORA_PP_COMMA_UNLESS_ZERO(n)	AURORA_PP_COMMA_UNLESS_ZERO_ ## n()
+#define AURORA_PP_COMMA_IF_0()
+#define AURORA_PP_COMMA_IF_1()	,
+#define AURORA_PP_COMMA_IF_2()	,
+#define AURORA_PP_COMMA_IF_3()	,
+#define AURORA_PP_COMMA_IF_4()	,
+#define AURORA_PP_COMMA_IF_5()	,
+#define AURORA_PP_COMMA_IF(n)	AURORA_PP_COMMA_IF_ ## n()
 
 
 // Index access to tuple (note: can be done without O(n^2) helper macros, e.g. in <boost/preprocessor/array/elem.hpp> 
