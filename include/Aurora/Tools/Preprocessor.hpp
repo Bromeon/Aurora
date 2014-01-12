@@ -73,4 +73,34 @@
 #define AURORA_PP_COMMA_UNLESS_ZERO_5()	,
 #define AURORA_PP_COMMA_UNLESS_ZERO(n)	AURORA_PP_COMMA_UNLESS_ZERO_ ## n()
 
+
+// Index access to tuple (note: can be done without O(n^2) helper macros, e.g. in <boost/preprocessor/array/elem.hpp> 
+#define AURORA_PP_AT_S1_N0(v0)					v0
+#define AURORA_PP_AT_S2_N0(v0, v1)				v0
+#define AURORA_PP_AT_S2_N1(v0, v1)				v1
+#define AURORA_PP_AT_S3_N0(v0, v1, v2)			v0
+#define AURORA_PP_AT_S3_N1(v0, v1, v2)			v1
+#define AURORA_PP_AT_S3_N2(v0, v1, v2)			v2
+#define AURORA_PP_AT_S4_N0(v0, v1, v2, v3)		v0
+#define AURORA_PP_AT_S4_N1(v0, v1, v2, v3)		v1
+#define AURORA_PP_AT_S4_N2(v0, v1, v2, v3)		v2
+#define AURORA_PP_AT_S4_N3(v0, v1, v2, v3)		v3
+#define AURORA_PP_AT_S5_N0(v0, v1, v2, v3, v4)	v0
+#define AURORA_PP_AT_S5_N1(v0, v1, v2, v3, v4)	v1
+#define AURORA_PP_AT_S5_N2(v0, v1, v2, v3, v4)	v2
+#define AURORA_PP_AT_S5_N3(v0, v1, v2, v3, v4)	v3
+#define AURORA_PP_AT_S5_N4(v0, v1, v2, v3, v4)	v4
+
+#define AURORA_PP_AT(size, n, tuple) AURORA_PP_CAT4(AURORA_PP_AT_S, size, _N, n) tuple
+
+
+// Iterate over tuple, apply each macro once
+#define AURORA_PP_FOREACH_1(macro, size, tuple)		                                        macro(AURORA_PP_AT(size, 0, tuple))
+#define AURORA_PP_FOREACH_2(macro, size, tuple)		AURORA_PP_FOREACH_1(macro, size, tuple) macro(AURORA_PP_AT(size, 1, tuple))
+#define AURORA_PP_FOREACH_3(macro, size, tuple)		AURORA_PP_FOREACH_2(macro, size, tuple) macro(AURORA_PP_AT(size, 2, tuple))
+#define AURORA_PP_FOREACH_4(macro, size, tuple)		AURORA_PP_FOREACH_3(macro, size, tuple) macro(AURORA_PP_AT(size, 3, tuple))
+#define AURORA_PP_FOREACH_5(macro, size, tuple)		AURORA_PP_FOREACH_4(macro, size, tuple) macro(AURORA_PP_AT(size, 4, tuple))
+
+#define AURORA_PP_FOREACH(macro, size, tuple)		AURORA_PP_CAT(AURORA_PP_FOREACH_, size) (macro, size, tuple)
+
 #endif // AURORA_PREPROCESSOR_HPP
