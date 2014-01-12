@@ -26,6 +26,13 @@
 /// @file
 /// @brief Utilities for preprocessor metaprogramming
 
+// Minimalistic implementation inspired by Boost.Preprocessor
+// Notes: 
+// - AURORA_PP_AT() can be implemented without O(n^2) helper macros, e.g. in <boost/preprocessor/array/elem.hpp>)
+// - Passing __VA_ARGS__ to non-variadic macros does not work reliably
+//   (see http://www.boost.org/doc/libs/1_55_0/libs/preprocessor/doc/topics/variadic_macros.html).
+
+
 #ifndef AURORA_PREPROCESSOR_HPP
 #define AURORA_PREPROCESSOR_HPP
 
@@ -46,7 +53,7 @@
 
 // Apply macro repeated times, counting from 0 to n
 #define AURORA_PP_ENUMERATE_0(macro)
-#define AURORA_PP_ENUMERATE_1(macro)			macro(1)
+#define AURORA_PP_ENUMERATE_1(macro)			                             macro(1)
 #define AURORA_PP_ENUMERATE_2(macro)			AURORA_PP_ENUMERATE_1(macro) macro(2)
 #define AURORA_PP_ENUMERATE_3(macro)			AURORA_PP_ENUMERATE_2(macro) macro(3)
 #define AURORA_PP_ENUMERATE_4(macro)			AURORA_PP_ENUMERATE_3(macro) macro(4)
@@ -56,7 +63,7 @@
 
 // Apply macro repeated times, counting from 0 to n and using a comma separator
 #define AURORA_PP_ENUMERATE_COMMA_0(macro)
-#define AURORA_PP_ENUMERATE_COMMA_1(macro)		macro(1)
+#define AURORA_PP_ENUMERATE_COMMA_1(macro)		                                    macro(1)
 #define AURORA_PP_ENUMERATE_COMMA_2(macro)		AURORA_PP_ENUMERATE_COMMA_1(macro), macro(2)
 #define AURORA_PP_ENUMERATE_COMMA_3(macro)		AURORA_PP_ENUMERATE_COMMA_2(macro), macro(3)
 #define AURORA_PP_ENUMERATE_COMMA_4(macro)		AURORA_PP_ENUMERATE_COMMA_3(macro), macro(4)
@@ -74,7 +81,7 @@
 #define AURORA_PP_COMMA_IF(n)	AURORA_PP_COMMA_IF_ ## n()
 
 
-// Index access to tuple (note: can be done without O(n^2) helper macros, e.g. in <boost/preprocessor/array/elem.hpp> 
+// Index access to tuple
 #define AURORA_PP_AT_S1_N0(v0)					v0
 #define AURORA_PP_AT_S2_N0(v0, v1)				v0
 #define AURORA_PP_AT_S2_N1(v0, v1)				v1
