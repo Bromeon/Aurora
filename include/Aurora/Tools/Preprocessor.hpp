@@ -136,4 +136,10 @@
 
 #define AURORA_PP_FOREACH_DATA(macro, size, tuple, data)	CAT(AURORA_PP_FOREACH_DATA_, size) (macro, size, tuple, data)
 
+
+// Size inference - does not work for empty tuples ()
+#define AURORA_PP_VA_SIZE(...) AURORA_PP_CAT(AURORA_PP_VA_SIZE_IMPL(__VA_ARGS__, 5, 4, 3, 2, 1,),)
+#define AURORA_PP_VA_SIZE_IMPL(e0, e1, e2, e3, e4, size, ...) size
+#define AURORA_PP_SIZE(tuple) AURORA_PP_VA_SIZE tuple
+
 #endif // AURORA_PREPROCESSOR_HPP
