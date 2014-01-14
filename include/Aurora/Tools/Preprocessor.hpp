@@ -53,11 +53,12 @@
 
 // Macro that can be passed to other macros and evaluates to empty space
 #define AURORA_PP_NOTHING
-#define AURORA_PP_NOTHING_VA(...)
+#define AURORA_PP_VA_CONSUME(...)
 
 
 // Macro that evaluates to its argument without changing it
-#define AURORA_PP_ID(expr) expr
+#define AURORA_PP_ID_IMPL(expr) expr
+#define AURORA_PP_ID(expr) AURORA_PP_ID_IMPL(expr)
 
 
 // Conditional evaluation
@@ -145,6 +146,17 @@
 #define AURORA_PP_FOREACH_DATA(macro, tuple, data)				AURORA_PP_FOREACH_DATA_SIZED(macro, AURORA_PP_SIZE(tuple), tuple, data)
 
 
+// Check whether a variadic argument list starts with (
+// Warning: From now on, you are entering the deep abyss of the preprocessor. Do not wonder why anything works at all.
+#define AURORA_PP_AURORA_PP_NO				0 AURORA_PP_VA_CONSUME(
+#define AURORA_PP_AURORA_PP_YES				1 AURORA_PP_VA_CONSUME(
+#define AURORA_PP_VA_CAT2(a, b, ...)		AURORA_PP_CAT(a, b)
+#define AURORA_PP_VA_YESNO_TO_10(a, ...)	AURORA_PP_VA_CAT2(AURORA_PP_, a) )
+#define AURORA_PP_NO(...)					AURORA_PP_YES
+
+#define AURORA_PP_VA_HAS_PARENTHESIS(...)	AURORA_PP_ID(AURORA_PP_VA_YESNO_TO_10(AURORA_PP_NO __VA_ARGS__))
+
+
 
 // VA size inference (argument lists with at least one argument)
 #define AURORA_PP_VA_POSITIVE_SIZE_IMPL(e0, e1, e2, e3, e4, e5, size, ...) size
@@ -160,15 +172,16 @@
 #define AURORA_PP_VA_SIZE_6 0
 
 #define AURORA_PP_VA_5COMMAS(...) ,,,,,
-#define AURORA_PP_VA_SIZE_IMPL(...) CAT(AURORA_PP_VA_SIZE_, AURORA_PP_VA_POSITIVE_SIZE(__VA_ARGS__))
+#define AURORA_PP_VA_SIZE_IMPL(...) AURORA_PP_CAT(AURORA_PP_VA_SIZE_, AURORA_PP_VA_POSITIVE_SIZE(__VA_ARGS__))
 #define AURORA_PP_VA_SIZE(...) AURORA_PP_VA_SIZE_IMPL(AURORA_PP_VA_5COMMAS __VA_ARGS__ ())
 
 
 // Tuple size
+#define AURORA_PP_SIZE_IMPL(tuple)		AURORA_PP_IF(AURORA_PP_VA_HAS_PARENTHESIS tuple, AURORA_PP_VA_POSITIVE_SIZE, AURORA_PP_VA_SIZE) tuple
 #ifdef _MSC_VER
-#define AURORA_PP_SIZE(tuple) AURORA_PP_CAT(AURORA_PP_VA_SIZE tuple, )
+	#define AURORA_PP_SIZE(tuple)		AURORA_PP_ID(AURORA_PP_SIZE_IMPL(tuple))
 #else
-#define AURORA_PP_SIZE(tuple) AURORA_PP_VA_SIZE tuple
+	#define AURORA_PP_SIZE(tuple)		AURORA_PP_SIZE_IMPL(tuple)
 #endif
 
 
