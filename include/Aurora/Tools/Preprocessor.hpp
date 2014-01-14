@@ -27,10 +27,21 @@
 /// @brief Utilities for preprocessor metaprogramming
 
 // Minimalistic implementation inspired by Boost.Preprocessor
+// Tricks used:
+// - Map numbers/values to other values: Concatenate macro with value; result is a predefined macro which is then substituted
+// - Lazy evaluation: Forward macros to others that effectively do the same (often 2 layers of indirection)
+// - Unpack tuples: Call macro without parenthesis around argument
+// - Count VA arguments: Forward them to another VA macro with enumerated argument list
+// - Detect empty arguments: Exploit property of function-style macros that are not substituted without an argument list
+// - Get rid of garbage passed as part of argument: Forward to VA macro that consumes all arguments
+//
 // Notes: 
-// - AURORA_PP_AT() can be implemented without O(n^2) helper macros, e.g. in <boost/preprocessor/array/elem.hpp>)
+// - Preprocessor metaprogramming is a whole different approach than anything else from C++; nothing is intuitive
+// - AURORA_PP_AT() can be implemented without O(n^2) helper macros, e.g. in <boost/preprocessor/array/elem.hpp>
 // - Passing __VA_ARGS__ to non-variadic macros does not work reliably
 //   (see http://www.boost.org/doc/libs/1_55_0/libs/preprocessor/doc/topics/variadic_macros.html).
+// - Some macros behave differently when deeply nested; it may be difficult to combine them
+// - Many macros behave differently on VC++ and g++, just in case it gets boring
 
 
 #ifndef AURORA_PREPROCESSOR_HPP
@@ -51,7 +62,7 @@
 #define AURORA_PP_STRINGIZE(a)			AURORA_PP_STRINGIZE_IMPL(a)
 
 
-// Macro that can be passed to other macros and evaluates to empty space
+// Object and function macro that evaluate to empty space
 #define AURORA_PP_NOTHING
 #define AURORA_PP_VA_CONSUME(...)
 
@@ -61,14 +72,15 @@
 #define AURORA_PP_ID(expr) AURORA_PP_ID_IMPL(expr)
 
 
-// Conditional evaluation
+// Conditional evaluation - when using function style macros for true/falseCase, put the argument list after PP_IF(...), i.e. PP_IF(...)(args)
 #define AURORA_PP_IF_0(trueCase, falseCase)					falseCase
 #define AURORA_PP_IF_1(trueCase, falseCase)					trueCase
 #define AURORA_PP_IF_2(trueCase, falseCase)					trueCase
 #define AURORA_PP_IF_3(trueCase, falseCase)					trueCase
 #define AURORA_PP_IF_4(trueCase, falseCase)					trueCase
 #define AURORA_PP_IF_5(trueCase, falseCase)					trueCase
-#define AURORA_PP_IF_IMPL(condition, trueCase, falseCase)	AURORA_PP_IF_ ## condition(trueCase, falseCase)
+#define AURORA_PP_IF_IMPL2(condition, trueCase, falseCase)	AURORA_PP_IF_ ## condition(trueCase, falseCase)
+#define AURORA_PP_IF_IMPL(condition, trueCase, falseCase)	AURORA_PP_IF_IMPL2(condition, trueCase, falseCase)
 #define AURORA_PP_IF(condition, trueCase, falseCase)		AURORA_PP_IF_IMPL(condition, trueCase, falseCase)
 
 
@@ -147,7 +159,7 @@
 
 
 // Check whether a variadic argument list starts with (
-// Warning: From now on, you are entering the deep abyss of the preprocessor. Do not wonder why anything works at all.
+// Warning: From now on, you are entering the deep abyss of the preprocessor. The following macros depend on black magic; their functioning is probabilistic.
 #define AURORA_PP_AURORA_PP_NO				0 AURORA_PP_VA_CONSUME(
 #define AURORA_PP_AURORA_PP_YES				1 AURORA_PP_VA_CONSUME(
 #define AURORA_PP_VA_CAT2(a, b, ...)		AURORA_PP_CAT(a, b)
@@ -155,7 +167,6 @@
 #define AURORA_PP_NO(...)					AURORA_PP_YES
 
 #define AURORA_PP_VA_HAS_PARENTHESIS(...)	AURORA_PP_ID(AURORA_PP_VA_YESNO_TO_10(AURORA_PP_NO __VA_ARGS__))
-
 
 
 // VA size inference (argument lists with at least one argument)
@@ -171,17 +182,23 @@
 #define AURORA_PP_VA_SIZE_5 5
 #define AURORA_PP_VA_SIZE_6 0
 
-#define AURORA_PP_VA_5COMMAS(...) ,,,,,
-#define AURORA_PP_VA_SIZE_IMPL(...) AURORA_PP_CAT(AURORA_PP_VA_SIZE_, AURORA_PP_VA_POSITIVE_SIZE(__VA_ARGS__))
-#define AURORA_PP_VA_SIZE(...) AURORA_PP_VA_SIZE_IMPL(AURORA_PP_VA_5COMMAS __VA_ARGS__ ())
+#define AURORA_PP_VA_5COMMAS(...)		,,,,,
+#define AURORA_PP_VA_SIZE_IMPL(...)		AURORA_PP_CAT(AURORA_PP_VA_SIZE_, AURORA_PP_VA_POSITIVE_SIZE(__VA_ARGS__))
+#define AURORA_PP_VA_SIZE(...)			AURORA_PP_VA_SIZE_IMPL(AURORA_PP_VA_5COMMAS __VA_ARGS__ ())
 
 
 // Tuple size
-#define AURORA_PP_SIZE_IMPL(tuple)		AURORA_PP_IF(AURORA_PP_VA_HAS_PARENTHESIS tuple, AURORA_PP_VA_POSITIVE_SIZE, AURORA_PP_VA_SIZE) tuple
+#define AURORA_PP_POSITIVE_SIZE(tuple)	AURORA_PP_VA_POSITIVE_SIZE tuple
+
+#define AURORA_PP_SIZE_IMPL1(tuple)		AURORA_PP_IF(AURORA_PP_VA_HAS_PARENTHESIS tuple, AURORA_PP_VA_POSITIVE_SIZE, AURORA_PP_VA_SIZE) tuple
+#define AURORA_PP_SIZE_IMPL(tuple)		AURORA_PP_SIZE_IMPL1(tuple)
+
 #ifdef _MSC_VER
-	#define AURORA_PP_SIZE(tuple)		AURORA_PP_ID(AURORA_PP_SIZE_IMPL(tuple))
+	#define AURORA_PP_SIZE(tuple)		AURORA_PP_CAT(AURORA_PP_SIZE_IMPL(tuple),)	// works with nested tuples, but not deep inside other macros (especially IF)
+	#define AURORA_PP_FLAT_SIZE(tuple)	AURORA_PP_CAT(AURORA_PP_VA_SIZE tuple,)		// doesn't work with nested tuples
 #else
 	#define AURORA_PP_SIZE(tuple)		AURORA_PP_SIZE_IMPL(tuple)
+	#define AURORA_PP_FLAT_SIZE(tuple)	AURORA_PP_CAT(AURORA_PP_VA_SIZE tuple,)
 #endif
 
 
