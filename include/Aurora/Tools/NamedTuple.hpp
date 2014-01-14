@@ -88,10 +88,27 @@
 
 // Conversion function from named tuple to std::tuple
 #define AURORA_DETAIL_TOSTDTUPLE(typeVarPairs)													\
-std::tuple<AURORA_PP_FOREACH(AURORA_DETAIL_TYPE, typeVarPairs)> toStdTuple() const				\
-{																								\
-	return std::make_tuple(AURORA_PP_FOREACH(AURORA_DETAIL_VAR, typeVarPairs));					\
-}																								\
+	std::tuple<AURORA_PP_FOREACH(AURORA_DETAIL_TYPE, typeVarPairs)> toStdTuple() const			\
+	{																							\
+		return std::make_tuple(AURORA_PP_FOREACH(AURORA_DETAIL_VAR, typeVarPairs));				\
+	}																							\
+
+// Macro to define base functionality within named tuple
+#define AURORA_DETAIL_BASE_TUPLE(TupleName, typeVarPairs, extensions)							\
+	/* Member variables	*/																		\
+	AURORA_PP_FOREACH(AURORA_DETAIL_MEMDECL, typeVarPairs)										\
+																								\
+	/* Constructor */																			\
+	explicit TupleName(AURORA_PP_FOREACH(AURORA_DETAIL_PARAM, typeVarPairs))					\
+	AURORA_PP_IF(AURORA_PP_SIZE(typeVarPairs), :, AURORA_PP_NOTHING)							\
+	AURORA_PP_FOREACH(AURORA_DETAIL_INIT, typeVarPairs)											\
+	{																							\
+	}																							\
+																								\
+	/* toStdTuple() conversion function */														\
+	AURORA_DETAIL_TOSTDTUPLE(typeVarPairs)														\
+
+// ---------------------------------------------------------------------------------------------------------------------------
 
 
 /// @brief Comparison operator == for named tuples
@@ -99,35 +116,35 @@ std::tuple<AURORA_PP_FOREACH(AURORA_DETAIL_TYPE, typeVarPairs)> toStdTuple() con
 ///  Do not invoke this macro directly. It is passed to AURORA_NAMED_TUPLE_EXT.
 /// @hideinitializer
 #define AURORA_NT_EQUAL(TupleName, typeVarPairs)												\
-friend bool operator== (const TupleName& lhs, const TupleName& rhs)								\
-{																								\
-	return lhs.toStdTuple() == rhs.toStdTuple();												\
-}																								\
+	friend bool operator== (const TupleName& lhs, const TupleName& rhs)							\
+	{																							\
+		return lhs.toStdTuple() == rhs.toStdTuple();											\
+	}																							\
 
 /// @brief Comparison operator < for named tuples
 /// @details Supplies the named tuple with an operator< in the surrounding namespace, which compares lexicographically.
 ///  Do not invoke this macro directly. It is passed to AURORA_NAMED_TUPLE_EXT.
 /// @hideinitializer
 #define AURORA_NT_LESS(TupleName, typeVarPairs)													\
-friend bool operator< (const TupleName& lhs, const TupleName& rhs)								\
-{																								\
-	return lhs.toStdTuple() < rhs.toStdTuple();													\
-}																								\
+	friend bool operator< (const TupleName& lhs, const TupleName& rhs)							\
+	{																							\
+		return lhs.toStdTuple() < rhs.toStdTuple();												\
+	}																							\
 
 /// @brief Hash functor for named tuples
 /// @details Supplies the named tuple with a member typedef @a Hasher inside the tuple class.
 ///  Do not invoke this macro directly. It is passed to AURORA_NAMED_TUPLE_EXT.
 /// @hideinitializer
 #define AURORA_NT_HASHER(TupleName, typeVarPairs)												\
-struct Hasher																					\
-{																								\
-	std::size_t operator() (const TupleName& t)	const											\
+	struct Hasher																				\
 	{																							\
-		std::size_t h = 0;																		\
-		AURORA_PP_FOREACH(AURORA_DETAIL_HASHCOMBINE, typeVarPairs)								\
-		return h;																				\
-	}																							\
-};																								\
+		std::size_t operator() (const TupleName& t)	const										\
+		{																						\
+			std::size_t h = 0;																	\
+			AURORA_PP_FOREACH(AURORA_DETAIL_HASHCOMBINE, typeVarPairs)							\
+			return h;																			\
+		}																						\
+	};																							\
 
 /// @brief Default constructor for named tuples
 /// @details Supplies the named tuple with a default constructor calls each members' default constructor.
@@ -144,7 +161,11 @@ AURORA_PP_IF(AURORA_PP_SIZE(typeVarPairs), /* there is already a 0-argument ctor
 /// @param TupleName Name of the struct
 /// @param typeVarPairs Parenthesized sequence of (Type, variable) pairs, such as ((int, i), (double, d))
 /// @hideinitializer
-#define AURORA_NAMED_TUPLE(TupleName, typeVarPairs) AURORA_NAMED_TUPLE_EXT(TupleName, typeVarPairs, ())
+#define AURORA_NAMED_TUPLE(TupleName, typeVarPairs)															\
+struct TupleName																							\
+{																											\
+	AURORA_DETAIL_BASE_TUPLE(TupleName, typeVarPairs, extensions)											\
+};																											\
 
 /// @brief Named tuple definition with extended functionality
 /// @details Defines a struct type with a specified list of public members and a corresponding constructor.
@@ -152,25 +173,15 @@ AURORA_PP_IF(AURORA_PP_SIZE(typeVarPairs), /* there is already a 0-argument ctor
 /// @param typeVarPairs Parenthesized sequence of (Type, variable) pairs, such as ((int, i), (double, d))
 /// @param extensions Parenthesized sequence of extensions, such as (AURORA_NT_EQUAL, AURORA_NT_LESS)
 /// @hideinitializer
-#define AURORA_NAMED_TUPLE_EXT(TupleName, typeVarPairs, extensions)								\
-struct TupleName																				\
-{																								\
-	/* Member variables	*/																		\
-	AURORA_PP_FOREACH(AURORA_DETAIL_MEMDECL, typeVarPairs)										\
-																								\
-	/* Constructor */																			\
-	explicit TupleName(AURORA_PP_FOREACH(AURORA_DETAIL_PARAM, typeVarPairs))					\
-	AURORA_PP_IF(AURORA_PP_SIZE(typeVarPairs), :, AURORA_PP_NOTHING)							\
-	AURORA_PP_FOREACH(AURORA_DETAIL_INIT, typeVarPairs)											\
-	{																							\
-	}																							\
-																								\
-	/* toStdTuple() conversion function */														\
-	AURORA_DETAIL_TOSTDTUPLE(typeVarPairs)														\
-																								\
-	/* All extensions */																		\
-	AURORA_PP_FOREACH_DATA(AURORA_DETAIL_EXTENSION, extensions, (TupleName, typeVarPairs))		\
-};																								\
+#define AURORA_NAMED_TUPLE_EXT(TupleName, typeVarPairs, extensions)											\
+struct TupleName																							\
+{																											\
+	AURORA_DETAIL_BASE_TUPLE(TupleName, typeVarPairs, extensions)											\
+																											\
+	/* All extensions -- use positive size because size creates problems with called high-order macros */	\
+	AURORA_PP_FOREACH_DATA_SIZED(AURORA_DETAIL_EXTENSION, AURORA_PP_POSITIVE_SIZE(extensions),				\
+		extensions, (TupleName, typeVarPairs))																\
+};																											\
 
 /// @}
 	
