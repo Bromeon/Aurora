@@ -146,9 +146,25 @@
 
 
 
-// Size inference - does not work for empty tuples ()
-#define AURORA_PP_VA_SIZE(...) AURORA_PP_CAT(AURORA_PP_VA_SIZE_IMPL(__VA_ARGS__, 5, 4, 3, 2, 1,),)
-#define AURORA_PP_VA_SIZE_IMPL(e0, e1, e2, e3, e4, size, ...) size
+// VA size inference (argument lists with at least one argument)
+#define AURORA_PP_VA_POSITIVE_SIZE_IMPL(e0, e1, e2, e3, e4, e5, size, ...) size
+#define AURORA_PP_VA_POSITIVE_SIZE(...) AURORA_PP_CAT(AURORA_PP_VA_POSITIVE_SIZE_IMPL(__VA_ARGS__, 6, 5, 4, 3, 2, 1,), AURORA_PP_NOTHING)
+
+
+// VA size inference, including empty argument lists
+#define AURORA_PP_VA_SIZE_1 1
+#define AURORA_PP_VA_SIZE_2 2
+#define AURORA_PP_VA_SIZE_3 3
+#define AURORA_PP_VA_SIZE_4 4
+#define AURORA_PP_VA_SIZE_5 5
+#define AURORA_PP_VA_SIZE_6 0
+
+#define AURORA_PP_VA_5COMMAS(...) ,,,,,
+#define AURORA_PP_VA_SIZE_IMPL(...) CAT(AURORA_PP_VA_SIZE_, AURORA_PP_VA_POSITIVE_SIZE(__VA_ARGS__))
+#define AURORA_PP_VA_SIZE(...) AURORA_PP_VA_SIZE_IMPL(AURORA_PP_VA_5COMMAS __VA_ARGS__ ())
+
+
+// Tuple size
 #ifdef _MSC_VER
 #define AURORA_PP_SIZE(tuple) AURORA_PP_CAT(AURORA_PP_VA_SIZE tuple, )
 #else
