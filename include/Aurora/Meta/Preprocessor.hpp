@@ -49,6 +49,10 @@
 
 #include <Aurora/Config.hpp>
 
+
+/// @addtogroup Meta
+/// @{
+
 // Concatenation
 #define AURORA_PP_CAT_IMPL(a, b)		a ## b
 #define AURORA_PP_CAT(a, b)				AURORA_PP_CAT_IMPL(a, b)
@@ -201,5 +205,6 @@
 	#define AURORA_PP_FLAT_SIZE(tuple)	AURORA_PP_CAT(AURORA_PP_VA_SIZE tuple,)
 #endif
 
+/// @}
 
 #endif // AURORA_PREPROCESSOR_HPP
