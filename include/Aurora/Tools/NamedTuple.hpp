@@ -113,7 +113,7 @@
 
 /// @brief Comparison operator == for named tuples
 /// @details Supplies the named tuple with an operator== in the surrounding namespace, which compares member-wise.
-///  Do not invoke this macro directly. It is passed to AURORA_NAMED_TUPLE_EXT.
+///  Do not invoke this macro directly. It is passed to @ref AURORA_NAMED_TUPLE_EXT.
 /// @hideinitializer
 #define AURORA_NT_EQUAL(TupleName, typeVarPairs)												\
 	friend bool operator== (const TupleName& lhs, const TupleName& rhs)							\
@@ -123,7 +123,7 @@
 
 /// @brief Comparison operator < for named tuples
 /// @details Supplies the named tuple with an operator< in the surrounding namespace, which compares lexicographically.
-///  Do not invoke this macro directly. It is passed to AURORA_NAMED_TUPLE_EXT.
+///  Do not invoke this macro directly. It is passed to @ref AURORA_NAMED_TUPLE_EXT.
 /// @hideinitializer
 #define AURORA_NT_LESS(TupleName, typeVarPairs)													\
 	friend bool operator< (const TupleName& lhs, const TupleName& rhs)							\
@@ -133,7 +133,7 @@
 
 /// @brief Hash functor for named tuples
 /// @details Supplies the named tuple with a member typedef @a Hasher inside the tuple class.
-///  Do not invoke this macro directly. It is passed to AURORA_NAMED_TUPLE_EXT.
+///  Do not invoke this macro directly. It is passed to @ref AURORA_NAMED_TUPLE_EXT.
 /// @hideinitializer
 #define AURORA_NT_HASHER(TupleName, typeVarPairs)												\
 	struct Hasher																				\
@@ -148,18 +148,42 @@
 
 /// @brief Default constructor for named tuples
 /// @details Supplies the named tuple with a default constructor calls each members' default constructor.
-///  Do not invoke this macro directly. It is passed to AURORA_NAMED_TUPLE_EXT.
+///  Do not invoke this macro directly. It is passed to @ref AURORA_NAMED_TUPLE_EXT.
 /// @hideinitializer
 #define AURORA_NT_DEFAULT_CTOR(TupleName, typeVarPairs)											\
 AURORA_PP_IF(AURORA_PP_SIZE(typeVarPairs), /* there is already a 0-argument ctor if size==0 */	\
-	AURORA_DETAIL_DEFAULT_CTOR, AURORA_PP_NOTHING_VA)(TupleName, typeVarPairs)					\
-	/* Note: Above, we need PP_IF() to evaluate lazily, that's why the arguments are outside*/
+	AURORA_DETAIL_DEFAULT_CTOR, AURORA_PP_VA_CONSUME)(TupleName, typeVarPairs)					\
+	/* Note: Above, we need PP_IF() to evaluate lazily, that's why the arguments are outside */
 
 
 /// @brief Named tuple definition
 /// @details Defines a struct type with a specified list of public members and a corresponding constructor.
 /// @param TupleName Name of the struct
 /// @param typeVarPairs Parenthesized sequence of (Type, variable) pairs, such as ((int, i), (double, d))
+/// @details Example:
+/// @code 
+/// // Defines a named tuple called Index2D with two members x and y of type std::size_t
+/// AURORA_NAMED_TUPLE(Index2D,
+/// (
+///     (std::size_t,  x),
+///     (std::size_t,  y)
+/// ))
+/// 
+/// // Defines a named tuple called Tile with members index (of type Index2D) and visible (of type bool)
+/// AURORA_NAMED_TUPLE(Tile,
+/// (
+///     (Index2D,      index),
+///     (bool,         visible)
+/// ))
+/// 
+/// // Create tuple object using constructor
+/// Tile tile(Index2D(2, 3), true);
+///
+/// // Access members
+/// tile.index.x = 40;
+/// if (tile.visible)
+///     ...
+/// @endcode
 /// @hideinitializer
 #define AURORA_NAMED_TUPLE(TupleName, typeVarPairs)															\
 struct TupleName																							\
@@ -171,7 +195,29 @@ struct TupleName																							\
 /// @details Defines a struct type with a specified list of public members and a corresponding constructor.
 /// @param TupleName Name of the struct
 /// @param typeVarPairs Parenthesized sequence of (Type, variable) pairs, such as ((int, i), (double, d))
-/// @param extensions Parenthesized sequence of extensions, such as (AURORA_NT_EQUAL, AURORA_NT_LESS)
+/// @param extensions Parenthesized sequence of extensions, such as (AURORA_NT_EQUAL, AURORA_NT_LESS).
+///  Possible arguments are all macros that begin with AURORA_NT_.
+/// @details Example:
+/// @code
+/// // Defines a named tuple called Index2D, with a default constructor and operator<
+/// AURORA_NAMED_TUPLE_EXT(Index2D,
+/// (
+///     (std::size_t,  x),
+///     (std::size_t,  y)
+/// ),
+/// (AURORA_NT_DEFAULT_CTOR, AURORA_NT_LESS))
+/// 
+/// // Use constructor with arguments and default constructor
+/// Index2D i(2, 1);
+/// Index2D j;
+/// 
+/// // Access members
+/// j.x = 1;
+/// j.y = 3;
+/// 
+/// // Use operator< for key in map
+/// std::map<Index2D, Tile> tileMap;
+/// @endcode
 /// @hideinitializer
 #define AURORA_NAMED_TUPLE_EXT(TupleName, typeVarPairs, extensions)											\
 struct TupleName																							\
