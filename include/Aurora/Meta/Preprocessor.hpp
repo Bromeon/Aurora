@@ -55,6 +55,9 @@
 
 // Concatenation
 #define AURORA_PP_CAT_IMPL(a, b)		a ## b
+
+/// @brief Concatenate two expressions (lazy ## operator)
+/// @hideinitializer
 #define AURORA_PP_CAT(a, b)				AURORA_PP_CAT_IMPL(a, b)
 #define AURORA_PP_CAT3(a, b, c)			AURORA_PP_CAT(AURORA_PP_CAT(a, b), c)
 #define AURORA_PP_CAT4(a, b, c, d)		AURORA_PP_CAT3(AURORA_PP_CAT(a, b), c, d)
@@ -63,6 +66,9 @@
 
 // Convert to string literal
 #define AURORA_PP_STRINGIZE_IMPL(a)		#a
+
+/// @brief Convert expression to string (lazy # operator)
+/// @hideinitializer
 #define AURORA_PP_STRINGIZE(a)			AURORA_PP_STRINGIZE_IMPL(a)
 
 
@@ -76,7 +82,7 @@
 #define AURORA_PP_ID(expr) AURORA_PP_ID_IMPL(expr)
 
 
-// Conditional evaluation - when using function style macros for true/falseCase, put the argument list after PP_IF(...), i.e. PP_IF(...)(args)
+// Conditional evaluation
 #define AURORA_PP_IF_0(trueCase, falseCase)					falseCase
 #define AURORA_PP_IF_1(trueCase, falseCase)					trueCase
 #define AURORA_PP_IF_2(trueCase, falseCase)					trueCase
@@ -85,6 +91,12 @@
 #define AURORA_PP_IF_5(trueCase, falseCase)					trueCase
 #define AURORA_PP_IF_IMPL2(condition, trueCase, falseCase)	AURORA_PP_IF_ ## condition(trueCase, falseCase)
 #define AURORA_PP_IF_IMPL(condition, trueCase, falseCase)	AURORA_PP_IF_IMPL2(condition, trueCase, falseCase)
+
+/// @brief Conditional evaluation
+/// @details If @a condition evaluates to a positive number, then the expression will be replaced with @a trueCase. If @a condition is zero,
+///  then it will be @a falseCase.
+/// @n@n When you use function style macros for @a trueCase and @a falseCase, put the argument list after the invocation, i.e. AURORA_PP_IF(...)(args)
+/// @hideinitializer
 #define AURORA_PP_IF(condition, trueCase, falseCase)		AURORA_PP_IF_IMPL(condition, trueCase, falseCase)
 
 
@@ -95,6 +107,12 @@
 #define AURORA_PP_ENUMERATE_3(macro)			AURORA_PP_ENUMERATE_2(macro) macro(3)
 #define AURORA_PP_ENUMERATE_4(macro)			AURORA_PP_ENUMERATE_3(macro) macro(4)
 #define AURORA_PP_ENUMERATE_5(macro)			AURORA_PP_ENUMERATE_4(macro) macro(5)
+
+/// @brief Apply a macro repeated times
+/// @param n Number of invocations
+/// @param macro Macro with signature <i>macro(index)</i>, where @a index is a number from 0 to n-1.
+/// @details Invokes the macro n times, passing it the indices from 0 to n-1 in this order.
+/// @hideinitializer
 #define AURORA_PP_ENUMERATE(n, macro)			AURORA_PP_ENUMERATE_ ## n(macro)
 
 
@@ -105,6 +123,13 @@
 #define AURORA_PP_ENUMERATE_COMMA_3(macro)		AURORA_PP_ENUMERATE_COMMA_2(macro), macro(3)
 #define AURORA_PP_ENUMERATE_COMMA_4(macro)		AURORA_PP_ENUMERATE_COMMA_3(macro), macro(4)
 #define AURORA_PP_ENUMERATE_COMMA_5(macro)		AURORA_PP_ENUMERATE_COMMA_4(macro), macro(5)
+
+/// @brief Apply a macro repeated times, comma-separated
+/// @param n Number of invocations
+/// @param macro Macro with signature <i>macro(index)</i>, where @a index is a number from 0 to n-1.
+/// @details Invokes the macro n times, passing it the indices from 0 to n-1 in this order. Puts a comma
+///  between each invocation.
+/// @hideinitializer
 #define AURORA_PP_ENUMERATE_COMMA(n, macro)		AURORA_PP_ENUMERATE_COMMA_ ## n(macro)
 
 
@@ -115,6 +140,10 @@
 #define AURORA_PP_COMMA_IF_3()	,
 #define AURORA_PP_COMMA_IF_4()	,
 #define AURORA_PP_COMMA_IF_5()	,
+
+/// @brief Comma if non-zero argument
+/// @details Evaluates to a comma if n is positive, and to nothing if n is zero.
+/// @hideinitializer
 #define AURORA_PP_COMMA_IF(n)	AURORA_PP_COMMA_IF_ ## n()
 
 
@@ -135,6 +164,12 @@
 #define AURORA_PP_AT_S5_N3(v0, v1, v2, v3, v4)	v3
 #define AURORA_PP_AT_S5_N4(v0, v1, v2, v3, v4)	v4
 
+/// @brief Access element of tuple
+/// @param size Size of the tuple. Can be inferred using @ref AURORA_PP_SIZE.
+/// @param n Index of the element to access, 0 < n < size-1
+/// @param tuple Preprocessor tuple such as (a, b, c)
+/// @details Returns the n-th element of a tuple.
+/// @hideinitializer
 #define AURORA_PP_AT(size, n, tuple) AURORA_PP_CAT4(AURORA_PP_AT_S, size, _N, n) tuple
 
 
@@ -147,6 +182,13 @@
 #define AURORA_PP_FOREACH_5(macro, size, tuple)		AURORA_PP_FOREACH_4(macro, size, tuple) macro(AURORA_PP_AT(size, 4, tuple), 4)
 
 #define AURORA_PP_FOREACH_SIZED(macro, size, tuple)	AURORA_PP_CAT(AURORA_PP_FOREACH_, size) (macro, size, tuple)
+
+/// @brief Apply macro for each element in tuple
+/// @param macro Macro with signature <i>macro(value, index)</i>, where @a value is the current element of the tuple and
+///  @a index is its index as a number from 0 to n-1.
+/// @param tuple Parenthesized tuple, such as (a, b, c). May be empty.
+/// @details Applies a macro repeated times, passing it every element in a tuple.
+/// @hideinitializer
 #define AURORA_PP_FOREACH(macro, tuple)				AURORA_PP_FOREACH_SIZED(macro, AURORA_PP_SIZE(tuple), tuple)
 
 
@@ -159,6 +201,15 @@
 #define AURORA_PP_FOREACH_DATA_5(macro, size, tuple, data)		AURORA_PP_FOREACH_DATA_4(macro, size, tuple, data) macro(AURORA_PP_AT(size, 4, tuple), 4, data)
 
 #define AURORA_PP_FOREACH_DATA_SIZED(macro, size, tuple, data)	AURORA_PP_CAT(AURORA_PP_FOREACH_DATA_, size) (macro, size, tuple, data)
+
+/// @brief Apply macro for each element in tuple, with additional argument
+/// @param macro Macro with signature <i>macro(value, index, data)</i>, where @a value is the current element of the tuple, 
+///  @a index is its index as a number from 0 to n-1, and @a data is the additional argument being forwarded.
+/// @param tuple Parenthesized tuple, such as (a, b, c). May be empty.
+/// @param data Additional argument to forward.
+/// @details Applies a macro repeated times, passing it every element in a tuple. Additional data can be specified that doesn't affect the repetition, but is
+///  passed to each macro invocation as an additional argument.
+/// @hideinitializer
 #define AURORA_PP_FOREACH_DATA(macro, tuple, data)				AURORA_PP_FOREACH_DATA_SIZED(macro, AURORA_PP_SIZE(tuple), tuple, data)
 
 
@@ -192,18 +243,31 @@
 
 
 // Tuple size
+
+/// @brief Size of a non-empty preprocessor tuple
+/// @param tuple Preprocessor tuple such as (a, b, c), of which the size is inferred.
+/// @details Returns a non-zero number of elements in a tuple. Use this macro whenever you are sure that a tuple will not be empty.
+/// @hideinitializer
 #define AURORA_PP_POSITIVE_SIZE(tuple)	AURORA_PP_VA_POSITIVE_SIZE tuple
 
-#define AURORA_PP_SIZE_IMPL1(tuple)		AURORA_PP_IF(AURORA_PP_VA_HAS_PARENTHESIS tuple, AURORA_PP_VA_POSITIVE_SIZE, AURORA_PP_VA_SIZE) tuple
-#define AURORA_PP_SIZE_IMPL(tuple)		AURORA_PP_SIZE_IMPL1(tuple)
+#define AURORA_PP_SIZE_IMPL2(tuple)		AURORA_PP_IF(AURORA_PP_VA_HAS_PARENTHESIS tuple, AURORA_PP_VA_POSITIVE_SIZE, AURORA_PP_VA_SIZE) tuple
+#define AURORA_PP_SIZE_IMPL1(tuple)		AURORA_PP_SIZE_IMPL2(tuple)
 
 #ifdef _MSC_VER
-	#define AURORA_PP_SIZE(tuple)		AURORA_PP_CAT(AURORA_PP_SIZE_IMPL(tuple),)	// works with nested tuples, but not deep inside other macros (especially IF)
+	#define AURORA_PP_SIZE_IMPL(tuple)	AURORA_PP_CAT(AURORA_PP_SIZE_IMPL1(tuple),)	// works with nested tuples, but not deep inside other macros (especially IF)
 	#define AURORA_PP_FLAT_SIZE(tuple)	AURORA_PP_CAT(AURORA_PP_VA_SIZE tuple,)		// doesn't work with nested tuples
 #else
-	#define AURORA_PP_SIZE(tuple)		AURORA_PP_SIZE_IMPL(tuple)
+	#define AURORA_PP_SIZE_IMPL(tuple)	AURORA_PP_SIZE_IMPL1(tuple)
 	#define AURORA_PP_FLAT_SIZE(tuple)	AURORA_PP_CAT(AURORA_PP_VA_SIZE tuple,)
 #endif
+
+/// @brief Size of a preprocessor tuple
+/// @param tuple Preprocessor tuple such as (a, b, c), of which the size is inferred.
+/// @details Returns the number of elements in a tuple. The size inference may fail in special cases with nested macros.
+///  If you are sure that a tuple is non-empty, use @ref AURORA_PP_POSITIVE_SIZE instead, which
+///  is simpler and more robust.
+/// @hideinitializer
+#define AURORA_PP_SIZE(tuple) AURORA_PP_SIZE_IMPL(tuple)
 
 /// @}
 
