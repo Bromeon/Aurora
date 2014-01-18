@@ -129,11 +129,11 @@
 
 // Apply macro repeated times, counting from 0 to n
 #define AURORA_PP_ENUMERATE_0(macro)
-#define AURORA_PP_ENUMERATE_1(macro)			                             macro(1)
-#define AURORA_PP_ENUMERATE_2(macro)			AURORA_PP_ENUMERATE_1(macro) macro(2)
-#define AURORA_PP_ENUMERATE_3(macro)			AURORA_PP_ENUMERATE_2(macro) macro(3)
-#define AURORA_PP_ENUMERATE_4(macro)			AURORA_PP_ENUMERATE_3(macro) macro(4)
-#define AURORA_PP_ENUMERATE_5(macro)			AURORA_PP_ENUMERATE_4(macro) macro(5)
+#define AURORA_PP_ENUMERATE_1(macro)			                             macro(0)
+#define AURORA_PP_ENUMERATE_2(macro)			AURORA_PP_ENUMERATE_1(macro) macro(1)
+#define AURORA_PP_ENUMERATE_3(macro)			AURORA_PP_ENUMERATE_2(macro) macro(2)
+#define AURORA_PP_ENUMERATE_4(macro)			AURORA_PP_ENUMERATE_3(macro) macro(3)
+#define AURORA_PP_ENUMERATE_5(macro)			AURORA_PP_ENUMERATE_4(macro) macro(4)
 
 /// @brief Apply a macro repeated times
 /// @param n Number of invocations
@@ -152,11 +152,11 @@
 
 // Apply macro repeated times, counting from 0 to n and using a comma separator
 #define AURORA_PP_ENUMERATE_COMMA_0(macro)
-#define AURORA_PP_ENUMERATE_COMMA_1(macro)		                                    macro(1)
-#define AURORA_PP_ENUMERATE_COMMA_2(macro)		AURORA_PP_ENUMERATE_COMMA_1(macro), macro(2)
-#define AURORA_PP_ENUMERATE_COMMA_3(macro)		AURORA_PP_ENUMERATE_COMMA_2(macro), macro(3)
-#define AURORA_PP_ENUMERATE_COMMA_4(macro)		AURORA_PP_ENUMERATE_COMMA_3(macro), macro(4)
-#define AURORA_PP_ENUMERATE_COMMA_5(macro)		AURORA_PP_ENUMERATE_COMMA_4(macro), macro(5)
+#define AURORA_PP_ENUMERATE_COMMA_1(macro)		                                    macro(0)
+#define AURORA_PP_ENUMERATE_COMMA_2(macro)		AURORA_PP_ENUMERATE_COMMA_1(macro), macro(1)
+#define AURORA_PP_ENUMERATE_COMMA_3(macro)		AURORA_PP_ENUMERATE_COMMA_2(macro), macro(2)
+#define AURORA_PP_ENUMERATE_COMMA_4(macro)		AURORA_PP_ENUMERATE_COMMA_3(macro), macro(3)
+#define AURORA_PP_ENUMERATE_COMMA_5(macro)		AURORA_PP_ENUMERATE_COMMA_4(macro), macro(4)
 
 /// @brief Apply a macro repeated times, comma-separated
 /// @param n Number of invocations
