@@ -29,7 +29,7 @@
 // Minimalistic implementation inspired by Boost.Preprocessor
 // Tricks used:
 // - Map numbers/values to other values: Concatenate macro with value; result is a predefined macro which is then substituted
-// - Lazy evaluation: Forward macros to others that effectively do the same (often 2 layers of indirection)
+// - Force expansion: Forward macros to others that effectively do the same (often 2 layers of indirection)
 // - Unpack tuples: Call macro without parenthesis around argument
 // - Count VA arguments: Forward them to another VA macro with enumerated argument list
 // - Detect empty arguments: Exploit property of function-style macros that are not substituted without an argument list
@@ -56,7 +56,18 @@
 // Concatenation
 #define AURORA_PP_CAT_IMPL(a, b)		a ## b
 
-/// @brief Concatenate two expressions (lazy ## operator)
+/// @brief Concatenate two expressions (evaluated ## operator)
+/// @details This macro does the same as the built-in ## preprocessor operator, however the arguments are expanded before concatenation.
+/// @code
+/// #define FIRST  [evaluated 1st] 
+/// #define SECOND [evaluated 2nd] 
+/// #define LAZY_CAT() FIRST ## SECOND
+/// #define EXP_CAT()  AURORA_PP_CAT(FIRST, SECOND)
+/// 
+/// // Comparison between ## and Aurora's catenation macro
+/// LAZY_CAT()  // generates FIRSTSECOND
+/// EXP_CAT()   // generates [evaluated 1st][evaluated 2nd] 
+/// @endcode
 /// @hideinitializer
 #define AURORA_PP_CAT(a, b)				AURORA_PP_CAT_IMPL(a, b)
 #define AURORA_PP_CAT3(a, b, c)			AURORA_PP_CAT(AURORA_PP_CAT(a, b), c)
@@ -67,7 +78,17 @@
 // Convert to string literal
 #define AURORA_PP_STRINGIZE_IMPL(a)		#a
 
-/// @brief Convert expression to string (lazy # operator)
+/// @brief Convert expression to string (evaluated # operator)
+/// @details This macro does the same as the built-in # preprocessor operator, however the argument is expanded before stringization.
+/// @code
+/// #define MACRO(expr) [evaluated expr]
+/// #define LAZY_STRINGIZE(expr) #expr
+/// #define EXP_STRINGIZE(expr)  AURORA_PP_STRINGIZE(expr)
+/// 
+/// // Comparison between # and Aurora's stringize macro
+/// LAZY_STRINGIZE(MACRO(42))  // generates "MACRO(42)"
+/// EXP_STRINGIZE(MACRO(42))   // generates "[evaluated 42]"
+/// @endcode
 /// @hideinitializer
 #define AURORA_PP_STRINGIZE(a)			AURORA_PP_STRINGIZE_IMPL(a)
 
@@ -96,6 +117,12 @@
 /// @details If @a condition evaluates to a positive number, then the expression will be replaced with @a trueCase. If @a condition is zero,
 ///  then it will be @a falseCase.
 /// @n@n When you use function style macros for @a trueCase and @a falseCase, put the argument list after the invocation, i.e. AURORA_PP_IF(...)(args)
+/// @code
+/// AURORA_PP_IF(0, true, false) == false
+/// AURORA_PP_IF(1, true, false) == true
+/// AURORA_PP_IF(2, true, false) == true
+/// AURORA_PP_IF(3, true, false) == true
+/// @endcode
 /// @hideinitializer
 #define AURORA_PP_IF(condition, trueCase, falseCase)		AURORA_PP_IF_IMPL(condition, trueCase, falseCase)
 
@@ -112,6 +139,13 @@
 /// @param n Number of invocations
 /// @param macro Macro with signature <i>macro(index)</i>, where @a index is a number from 0 to n-1.
 /// @details Invokes the macro n times, passing it the indices from 0 to n-1 in this order.
+/// @code
+/// #define GENERATOR(index) [index]
+/// 
+/// AURORA_PP_ENUMERATE(4, GENERATOR)
+/// // generates:
+/// [0] [1] [2] [3]
+/// @endcode
 /// @hideinitializer
 #define AURORA_PP_ENUMERATE(n, macro)			AURORA_PP_ENUMERATE_ ## n(macro)
 
@@ -129,6 +163,13 @@
 /// @param macro Macro with signature <i>macro(index)</i>, where @a index is a number from 0 to n-1.
 /// @details Invokes the macro n times, passing it the indices from 0 to n-1 in this order. Puts a comma
 ///  between each invocation.
+/// @code
+/// #define GENERATOR(index) [index]
+/// 
+/// AURORA_PP_ENUMERATE_COMMA(4, GENERATOR)
+/// // generates:
+/// [0], [1], [2], [3]
+/// @endcode
 /// @hideinitializer
 #define AURORA_PP_ENUMERATE_COMMA(n, macro)		AURORA_PP_ENUMERATE_COMMA_ ## n(macro)
 
@@ -166,9 +207,14 @@
 
 /// @brief Access element of tuple
 /// @param size Size of the tuple. Can be inferred using @ref AURORA_PP_SIZE.
-/// @param n Index of the element to access, 0 < n < size-1
+/// @param n Index of the element to access, 0 <= n < size
 /// @param tuple Preprocessor tuple such as (a, b, c)
 /// @details Returns the n-th element of a tuple.
+/// @code
+/// AURORA_PP_AT(3, 0, (a, b, c)) == a
+/// AURORA_PP_AT(3, 1, (a, b, c)) == b
+/// AURORA_PP_AT(3, 2, (a, b, c)) == c
+/// @endcode
 /// @hideinitializer
 #define AURORA_PP_AT(size, n, tuple) AURORA_PP_CAT4(AURORA_PP_AT_S, size, _N, n) tuple
 
@@ -188,6 +234,16 @@
 ///  @a index is its index as a number from 0 to n-1.
 /// @param tuple Parenthesized tuple, such as (a, b, c). May be empty.
 /// @details Applies a macro repeated times, passing it every element in a tuple.
+/// @code
+/// #define MACRO(value, index)  [index]->value
+/// #define TUPLE                (first, second, third)
+/// 
+/// AURORA_PP_FOREACH(MACRO, TUPLE)
+/// // generates:
+/// [0]->first
+/// [1]->second
+/// [2]->third
+/// @endcode
 /// @hideinitializer
 #define AURORA_PP_FOREACH(macro, tuple)				AURORA_PP_FOREACH_SIZED(macro, AURORA_PP_SIZE(tuple), tuple)
 
@@ -209,6 +265,16 @@
 /// @param data Additional argument to forward.
 /// @details Applies a macro repeated times, passing it every element in a tuple. Additional data can be specified that doesn't affect the repetition, but is
 ///  passed to each macro invocation as an additional argument.
+/// @code
+/// #define MACRO(value, index, data)  [index]->(value, data)
+/// #define TUPLE                      (first, second, third)
+/// 
+/// AURORA_PP_FOREACH_DATA(MACRO, TUPLE, 42)
+/// // generates:
+/// [0]->(first, 42)
+/// [1]->(second, 42)
+/// [2]->(third, 42)
+/// @endcode
 /// @hideinitializer
 #define AURORA_PP_FOREACH_DATA(macro, tuple, data)				AURORA_PP_FOREACH_DATA_SIZED(macro, AURORA_PP_SIZE(tuple), tuple, data)
 
@@ -247,6 +313,12 @@
 /// @brief Size of a non-empty preprocessor tuple
 /// @param tuple Preprocessor tuple such as (a, b, c), of which the size is inferred.
 /// @details Returns a non-zero number of elements in a tuple. Use this macro whenever you are sure that a tuple will not be empty.
+/// @code
+/// AURORA_PP_POSITIVE_SIZE( () )     == undefined
+/// AURORA_PP_POSITIVE_SIZE( (a) )    == 1
+/// AURORA_PP_POSITIVE_SIZE( (a, b) ) == 2
+/// AURORA_PP_POSITIVE_SIZE( (()) )   == 1
+/// @endcode
 /// @hideinitializer
 #define AURORA_PP_POSITIVE_SIZE(tuple)	AURORA_PP_VA_POSITIVE_SIZE tuple
 
@@ -266,6 +338,12 @@
 /// @details Returns the number of elements in a tuple. The size inference may fail in special cases with nested macros.
 ///  If you are sure that a tuple is non-empty, use @ref AURORA_PP_POSITIVE_SIZE instead, which
 ///  is simpler and more robust.
+/// @code
+/// AURORA_PP_SIZE( () )     == 0
+/// AURORA_PP_SIZE( (a) )    == 1
+/// AURORA_PP_SIZE( (a, b) ) == 2
+/// AURORA_PP_SIZE( (()) )   == 1
+/// @endcode
 /// @hideinitializer
 #define AURORA_PP_SIZE(tuple) AURORA_PP_SIZE_IMPL(tuple)
 
