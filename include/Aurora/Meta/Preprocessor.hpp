@@ -152,7 +152,7 @@
 /// [0] [1] [2] [3]
 /// @endcode
 /// @hideinitializer
-#define AURORA_PP_ENUMERATE(n, macro)			AURORA_PP_ENUMERATE_ ## n(macro)
+#define AURORA_PP_ENUMERATE(n, macro)			AURORA_PP_CAT(AURORA_PP_ENUMERATE_, n)(macro)
 
 
 // Apply macro repeated times, counting from 0 to n and using a comma separator
