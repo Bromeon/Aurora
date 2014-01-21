@@ -53,6 +53,11 @@
 /// @addtogroup Meta
 /// @{
 
+/// @brief Limit for preprocessor metaprogramming arguments
+/// @details This number is the maximum size of preprocessor tuples and the highest number that can be passed to repetition macros.
+#define AURORA_PP_LIMIT 5
+
+
 // Concatenation
 #define AURORA_PP_CAT_IMPL(a, b)		a ## b
 
