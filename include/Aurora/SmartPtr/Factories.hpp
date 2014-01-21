@@ -46,8 +46,8 @@ namespace aurora
 
 /// @brief Creates an object inside the unique pointer.
 /// @param args Variable argument list, the single arguments are forwarded to T's constructor. Due to limited compiler support for
-///  variadic templates, the number of arguments may not exceed 5.
-/// @details Allows handy syntax analogous to std::make_shared, avoids explicit new operator. Example:
+	///  variadic templates, the number of arguments must be smaller than @ref AURORA_PP_LIMIT.
+	/// @details Allows handy syntax analogous to std::make_shared, avoids explicit new operator. Example:
 /// @code
 /// auto str = aurora::makeUnique<std::string>(3, 'a'); // creates "aaa"
 /// auto i = aurora::makeUnique<int>(37);               // creates 37
@@ -58,7 +58,7 @@ std::unique_ptr<T> makeUnique(Args... args);
 /// @relates CopiedPtr
 /// @brief Creates an object inside the copied pointer.
 /// @param args Variable argument list, the single arguments are forwarded to T's constructor. Due to limited compiler support for
-///  variadic templates, the number of arguments may not exceed 5.
+///  variadic templates, the number of arguments must be smaller than @ref AURORA_PP_LIMIT.
 /// @details Allows handy syntax analogous to std::make_shared, avoids explicit new operator. Example:
 /// @code
 /// auto str = aurora::makeCopied<std::string>(3, 'a'); // creates "aaa"
@@ -81,29 +81,19 @@ class CopiedPtr;
 #define AURORA_DETAIL_PARAMETER(n) A ## n && arg ## n
 #define AURORA_DETAIL_FORWARD_ARG(n) std::forward<A ## n>(arg ## n)
 
-#define AURORA_DETAIL_SMARTPTR_FACTORY(SmartPtr, factoryFunction, n)											\
+#define AURORA_DETAIL_SMARTPTR_FACTORY(SmartPtr, factoryFunction, n)									\
 	template <typename T AURORA_PP_COMMA_IF(n) AURORA_PP_ENUMERATE_COMMA(n, AURORA_DETAIL_TYPENAME)>	\
-	SmartPtr<T> factoryFunction(AURORA_PP_ENUMERATE_COMMA(n, AURORA_DETAIL_PARAMETER))							\
-	{																											\
-		return SmartPtr<T>(new T( AURORA_PP_ENUMERATE_COMMA(n, AURORA_DETAIL_FORWARD_ARG) ));					\
+	SmartPtr<T> factoryFunction(AURORA_PP_ENUMERATE_COMMA(n, AURORA_DETAIL_PARAMETER))					\
+	{																									\
+		return SmartPtr<T>(new T( AURORA_PP_ENUMERATE_COMMA(n, AURORA_DETAIL_FORWARD_ARG) ));			\
 	}
 
+#define AURORA_DETAIL_UNIQUEPTR_FACTORY(n) AURORA_DETAIL_SMARTPTR_FACTORY(std::unique_ptr, makeUnique, n)
+#define AURORA_DETAIL_COPIEDPTR_FACTORY(n) AURORA_DETAIL_SMARTPTR_FACTORY(CopiedPtr, makeCopied, n)
 
 // Actual function template overloads
-// Note: I can't apply AURORA_PP_ENUMERATE here because nested macros with the same name are not expanded
-AURORA_DETAIL_SMARTPTR_FACTORY(std::unique_ptr, makeUnique, 0)
-AURORA_DETAIL_SMARTPTR_FACTORY(std::unique_ptr, makeUnique, 1)
-AURORA_DETAIL_SMARTPTR_FACTORY(std::unique_ptr, makeUnique, 2)
-AURORA_DETAIL_SMARTPTR_FACTORY(std::unique_ptr, makeUnique, 3)
-AURORA_DETAIL_SMARTPTR_FACTORY(std::unique_ptr, makeUnique, 4)
-AURORA_DETAIL_SMARTPTR_FACTORY(std::unique_ptr, makeUnique, 5)
-
-AURORA_DETAIL_SMARTPTR_FACTORY(CopiedPtr, makeCopied, 0)
-AURORA_DETAIL_SMARTPTR_FACTORY(CopiedPtr, makeCopied, 1)
-AURORA_DETAIL_SMARTPTR_FACTORY(CopiedPtr, makeCopied, 2)
-AURORA_DETAIL_SMARTPTR_FACTORY(CopiedPtr, makeCopied, 3)
-AURORA_DETAIL_SMARTPTR_FACTORY(CopiedPtr, makeCopied, 4)
-AURORA_DETAIL_SMARTPTR_FACTORY(CopiedPtr, makeCopied, 5)
+AURORA_PP_ENUMERATE(AURORA_PP_LIMIT, AURORA_DETAIL_UNIQUEPTR_FACTORY)
+AURORA_PP_ENUMERATE(AURORA_PP_LIMIT, AURORA_DETAIL_COPIEDPTR_FACTORY)
 
 #endif // AURORA_DOXYGEN_SECTION
 
