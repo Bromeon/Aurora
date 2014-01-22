@@ -23,7 +23,27 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#pragma once
+// Some notes on derived-to-base conversion and why an additional indirection object (PtrIndirection) is necessary:
+// PtrOwnerBase must be a template of T. If it were not (like the reference counter in std::shared_ptr), then there would be no way to extract the
+// T* pointer of a PtrOwner [1], which is required after copying the PtrOwner. However, as long as PtrOwnerBase<T> is a template, no two CopiedPtr<X>
+// with different X can refer to the same type-erased base class template PtrOwnerBase. Thus, the PtrOwner implementation would have to create a
+// PtrOwner<U> with U != T, and because PtrOwner does not know both U and T [2], this is impossible.
+//
+// [1] There is no way of passing static type information across concrete derived implementation classes, when only the type-erased base is known.
+// shared_ptr doesn't need this extraction, because it has a direct pointer; however CopiedPtr creates a *new* pointer that is unknown.
+// [2] A CopiedPtr<Base> that is constructed from CopiedPtr<Derived> has no type information about the dynamic type held by the latter.
+// The dynamic type needn't be Derived, also VeryDerived (which inherits Derived) is possible -- through a previous CopiedPtr<Derived> constructor call
+// to either CopiedPtr(VeryDerived*), CopiedPtr(Derived*) or CopiedPtr(const CopiedPtr<VeryDerived>&). Note that in the 2nd case, the CopiedPtr has never
+// had any static type information, the user upcast the pointer already before passing it to the constructor. But even in the 1st and 3rd case, the
+// static type information is type-erased and only available within a derived object like PtrOwner.
+// 
+// Conclusion: In the general case, it is not possible to maintain a single type-erased object for the implementation of derived-to-base conversions.
+// Some special cases could be optimized using RTTI trial and error, but that's just a hack which doesn't solve the inherent underlying problem.
+// The current implementation is very clean: No static_cast, dynamic_cast or typeid is used.
+
+
+#ifndef AURORA_PTROWNER_HPP
+#define AURORA_PTROWNER_HPP
 
 #include <Aurora/Tools/NonCopyable.hpp>
 
@@ -86,7 +106,8 @@ namespace detail
 		D deleter;
 	};
 	
-	// Used for U* -> T* conversion
+	// Used for U* -> T* derived-to-base conversion
+	// See notes at the beginning of the document
 	template <typename T, typename U>
 	struct PtrIndirection : PtrOwnerBase<T>
 	{
@@ -118,6 +139,7 @@ namespace detail
 		PtrOwnerBase<U>* base;
 	};
 	
+	// Maker (object generator) idiom for PtrOwner
 	template <typename T, typename U, typename C, typename D>
 	PtrOwnerBase<T>* newPtrOwner(U* pointer, C cloner, D deleter)
 	{
@@ -126,3 +148,5 @@ namespace detail
 
 } // namespace detail
 } // namespace aurora
+
+#endif // AURORA_PTROWNER_HPP
