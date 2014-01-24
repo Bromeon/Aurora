@@ -48,6 +48,7 @@
 #include <Aurora/Tools/NonCopyable.hpp>
 
 #include <cassert>
+#include <utility>
 
 
 namespace aurora
@@ -55,9 +56,10 @@ namespace aurora
 namespace detail
 {
 	
-	// Types to differ between move and copy semantics
+	// Types to differ between copy, move and emplacement semantics
 	struct CopyTag {};
 	struct MoveTag {};
+	struct EmplaceTag {};
 
 	// Abstract base class for pointer owners
 	template <typename T>
@@ -106,6 +108,40 @@ namespace detail
 		D deleter;
 	};
 	
+
+#ifdef AURORA_HAS_VARIADIC_TEMPLATES
+
+	// Owner for makeCopied() optimization: Object is stored directly, no cloner or deleter
+	template <typename T>
+	struct CompactOwner : PtrOwnerBase<T>
+	{
+		template <typename... Args>
+		explicit CompactOwner(EmplaceTag, Args&&... args)
+		: object(std::forward<Args>(args)...) // construct in-place
+		{
+		}
+
+		CompactOwner(CopyTag, const T& origin) // separate constructor to maintain const
+		: object(origin) // copy-construct
+		{
+		}
+
+		virtual CompactOwner* clone() const
+		{
+			return new CompactOwner(CopyTag(), object);
+		}
+
+		virtual T* getPointer() const
+		{
+			return const_cast<T*>(&object);
+		}
+
+		T object;
+	};
+
+#endif // AURORA_HAS_VARIADIC_TEMPLATES
+
+
 	// Used for U* -> T* derived-to-base conversion
 	// See notes at the beginning of the document
 	template <typename T, typename U>
@@ -139,6 +175,7 @@ namespace detail
 		PtrOwnerBase<U>* base;
 	};
 	
+
 	// Maker (object generator) idiom for PtrOwner
 	template <typename T, typename U, typename C, typename D>
 	PtrOwnerBase<T>* newPtrOwner(U* pointer, C cloner, D deleter)

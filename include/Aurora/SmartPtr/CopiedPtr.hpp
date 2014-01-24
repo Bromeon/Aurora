@@ -30,12 +30,14 @@
 #define AURORA_COPIEDPTR_HPP
 
 #include <Aurora/SmartPtr/PtrFunctors.hpp>
+#include <Aurora/SmartPtr/MakeCopied.hpp>
 #include <Aurora/SmartPtr/Detail/PtrOwner.hpp>
 #include <Aurora/Tools/SafeBool.hpp>
 #include <Aurora/Config.hpp>
 
 #include <algorithm>
 #include <type_traits>
+#include <utility>
 
 
 namespace aurora
@@ -136,6 +138,19 @@ class CopiedPtr
 			source.mOwner = nullptr;
 			source.mPointer = nullptr;
 		}
+
+#ifdef AURORA_HAS_VARIADIC_TEMPLATES
+
+		// [Implementation detail]
+		// Emplacement constructor: Used to implement makeCopied<T>(args)
+		template <typename... Args>
+		CopiedPtr(detail::EmplaceTag, Args&&... args)
+		: mOwner(new detail::CompactOwner<T>(detail::EmplaceTag(), std::forward<Args>(args)...))
+		, mPointer(mOwner->getPointer())
+		{
+		}
+
+#endif // AURORA_HAS_VARIADIC_TEMPLATES
 
 		/// @brief Copy assignment operator
 		/// @param origin Original smart pointer
