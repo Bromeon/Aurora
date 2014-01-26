@@ -79,11 +79,16 @@ namespace detail
 	template <typename T, typename U, typename C, typename D>
 	struct PtrOwner : PtrOwnerBase<T>
 	{
-		PtrOwner(U* pointer, C cloner, D deleter)
+		PtrOwner(U* pointer, C cloner, D deleter, bool doClone = false)
 		: pointer(pointer)
 		, cloner(cloner)
 		, deleter(deleter)
 		{
+			assert(pointer);
+
+			// Exception safety: If cloning fails, constructor will be aborted, reverting surrounding new operator
+			if (doClone)
+				this->pointer = cloner(pointer);
 		}
 
 		virtual ~PtrOwner()
@@ -94,8 +99,7 @@ namespace detail
 
 		virtual PtrOwner* clone() const
 		{
-			assert(pointer);
-			return new PtrOwner(cloner(pointer), cloner, deleter);
+			return new PtrOwner(pointer, cloner, deleter, true);
 		}
 
 		virtual T* getPointer() const
