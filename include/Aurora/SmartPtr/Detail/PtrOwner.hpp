@@ -184,7 +184,10 @@ namespace detail
 	template <typename T, typename U, typename C, typename D>
 	PtrOwnerBase<T>* newPtrOwner(U* pointer, C cloner, D deleter)
 	{
-		return new PtrOwner<T, U, C, D>(pointer, cloner, deleter);
+		if (pointer)
+			return new PtrOwner<T, U, C, D>(pointer, cloner, deleter);
+		else
+			return nullptr;
 	}
 
 } // namespace detail
