@@ -131,6 +131,22 @@ auto tupleTransform(const SrcTuple& src) -> AURORA_AUTO_RETURN
 	detail::TupleTransform<SrcTuple, Transformer, std::tuple_size<SrcTuple>::value>::apply(src)
 )
 
+/// @brief Return the first element of a tuple
+/// 
+template <typename Tuple>
+auto tupleFront(Tuple&& t) -> AURORA_AUTO_RETURN
+(
+	std::get<0>(t)
+)
+
+/// @brief Return the last element of a tuple
+/// 
+template <typename Tuple>
+auto tupleBack(Tuple&& t) -> AURORA_AUTO_RETURN
+(
+	std::get<std::tuple_size<typename std::remove_reference<Tuple>::type>::value - 1>(t)
+)
+
 /// @}
 
 } // namespace aurora
