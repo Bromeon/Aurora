@@ -72,12 +72,12 @@ namespace detail
 
 		virtual AbstractIteratorPtr begin()
 		{
-			return makeSubIterator<T>(mBegin, mEnd, true);
+			return isEmpty() ? nullptr : makeSubIterator<T>(mBegin, mEnd, true);
 		}
 
 		virtual AbstractIteratorPtr beforeEnd()
 		{
-			return makeSubIterator<T>(mBegin, mEnd, false);
+			return isEmpty() ? nullptr : makeSubIterator<T>(mBegin, mEnd, false);
 		}
 
 		virtual AbstractIteratorPtr next(AbstractIteratorPtr sink)
@@ -92,8 +92,13 @@ namespace detail
 			return nullptr;
 		}
 
-		Itr mBegin;
-		Itr mEnd;
+		bool isEmpty() const
+		{
+			return mBegin == mEnd;
+		}
+
+		const Itr mBegin;
+		const Itr mEnd;
 	};
 	
 	// ---------------------------------------------------------------------------------------------------------------------------
@@ -117,14 +122,31 @@ namespace detail
 			return dynamicGet<CommonBase>(mTuple, index);
 		}
 
+		AbstractIteratorPtr findClosestIterator(std::size_t index, std::ptrdiff_t step)
+		{
+			// Step as long as there is still a directly or indirectly following non-empty subrange
+			while (auto* subrange = getSubRange(index))
+			{
+				// If next subrange available, return its begin
+				// If previous subrange available, return its before-end
+				if (auto ptr = (step > 0) ? subrange->begin() : subrange->beforeEnd())
+					return indexify(std::move(ptr), index);
+
+				index += step;
+			}
+
+			// Either end of sequence reached
+			return nullptr;
+		}
+
 		virtual AbstractIteratorPtr begin()
 		{
-			return indexify(tupleFront(mTuple).begin(), 0u);
+			return findClosestIterator(0u, +1);
 		}
 
 		virtual AbstractIteratorPtr beforeEnd()
 		{
-			return indexify(tupleBack(mTuple).beforeEnd(), std::tuple_size<Tuple>::value - 1u);
+			return findClosestIterator(std::tuple_size<Tuple>::value - 1u, -1);
 		}
 
 		virtual AbstractIteratorPtr next(AbstractIteratorPtr sink)
@@ -140,18 +162,10 @@ namespace detail
 		AbstractIteratorPtr step(AbstractIteratorPtr sink, std::ptrdiff_t offset)
 		{
 			assert(sink);
+			assert(offset == +1 || offset == -1); // random access not yet supported
+			
 			std::size_t nextIndex = sink->getSubrangeIndex() + offset;
-
-			// If next subrange available, return its begin (mark iterator with its index)
-			if (auto* subrange = getSubRange(nextIndex))
-			{
-				auto ptr = (offset > 0) ? subrange->begin() : subrange->beforeEnd();
-				return indexify(ptr, nextIndex);
-			}
-			else
-			{
-				return nullptr;
-			}
+			return findClosestIterator(nextIndex, offset);
 		}
 
 		AbstractIteratorPtr indexify(AbstractIteratorPtr forwarded, std::size_t index)
