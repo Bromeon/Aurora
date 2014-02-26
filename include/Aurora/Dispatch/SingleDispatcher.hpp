@@ -139,11 +139,18 @@ class SingleDispatcher : private NonCopyable
 
 		/// @brief Dispatches the key of @a arg and invokes the corresponding function.
 		/// @details Traits::keyFromBase(arg) is invoked to determine the key of the passed argument. The function bound to that
-		///  key is then looked up in the map and invoked.
+		///  key is then looked up in the map and invoked. If no match is found and a fallback function has been registered using
+		///  fallback(), then the fallback function will be invoked.
 		/// @param arg Function argument as a reference or pointer.
 		/// @return The return value of the dispatched function, if any.
-		/// @throw FunctionCallException when no corresponding function is found.
+		/// @throw FunctionCallException when no corresponding function is found and no fallback has been registered.
 		R							call(B arg) const;
+
+		/// @brief Registers a fallback function.
+		/// @details The passed function will be invoked when call() doesn't find a registered function. It can be used when
+		///  not finding a match does not represent an exceptional situation, but a common case.
+		/// @param function Function with signature R(B).
+		void						fallback(std::function<R(B)> function);
 
 
 	// ---------------------------------------------------------------------------------------------------------------------------
@@ -158,6 +165,7 @@ class SingleDispatcher : private NonCopyable
 	// Private variables
 	private:
 		FnMap						mMap;
+		BaseFunction				mFallback;
 };
 
 /// @}

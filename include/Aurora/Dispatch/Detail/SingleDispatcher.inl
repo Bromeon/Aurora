@@ -47,10 +47,21 @@ R SingleDispatcher<B, R, Traits>::call(B arg) const
 	// If no corresponding class (or base class) has been found, throw exception
 	auto itr = mMap.find(key);
 	if (itr == mMap.end())
-		throw FunctionCallException(std::string("SingleDispatcher::call() - function with parameter \"") + Traits::name(key) +  "\" not registered");
+	{
+		if (mFallback)
+			return mFallback(arg);
+		else
+			throw FunctionCallException(std::string("SingleDispatcher::call() - function with parameter \"") + Traits::name(key) + "\" not registered");
+	}
 
 	// Otherwise, call dispatched function
 	return itr->second(arg);
+}
+
+template <class B, typename R, class Traits>
+void SingleDispatcher<B, R, Traits>::fallback(std::function<R(B)> function)
+{
+	mFallback = std::move(function);
 }
 
 } // namespace aurora

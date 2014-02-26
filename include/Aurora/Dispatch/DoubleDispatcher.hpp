@@ -145,14 +145,21 @@ class DoubleDispatcher : private NonCopyable
 
 		/// @brief Dispatches the key of @a arg1 and @a arg2 and invokes the corresponding function.
 		/// @details Traits::keyFromBase(arg) is invoked to determine the key of each passed argument. The function bound to the
-		///  combination of both keys is then looked up in the map and invoked.
+		///  combination of both keys is then looked up in the map and invoked. If no match is found and a fallback function has
+		///  been registered using fallback(), then the fallback function will be invoked.
 		///  @n@n When the dispatcher is configured in symmetric mode (see constructor), then the arguments are forwarded to the
 		///  correct parameters in the registered functions, even if the order is different. When necessary, they are swapped.
 		///  In other words, symmetric dispatchers don't care about the order of the arguments at all.
 		/// @param arg1,arg2 Function arguments as references or pointers.
 		/// @return The return value of the dispatched function, if any.
-		/// @throw FunctionCallException when no corresponding function is found.
+		/// @throw FunctionCallException when no corresponding function is found and no fallback has been registered.
 		R							call(B arg1, B arg2) const;
+
+		/// @brief Registers a fallback function.
+		/// @details The passed function will be invoked when call() doesn't find a registered function. It can be used when
+		///  not finding a match does not represent an exceptional situation, but a common case.
+		/// @param function Function with signature R(B, B).
+		void						fallback(std::function<R(B, B)> function);
 
 
 	// ---------------------------------------------------------------------------------------------------------------------------
@@ -189,6 +196,7 @@ class DoubleDispatcher : private NonCopyable
 	// Private variables
 	private:
 		FnMap						mMap;
+		BaseFunction				mFallback;
 		bool						mSymmetric;
 };
 
