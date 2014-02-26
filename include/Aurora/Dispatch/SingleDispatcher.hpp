@@ -58,7 +58,8 @@ namespace aurora
 ///  the dispatched functions shall have arguments of type pointer or reference to const, too.
 /// @tparam R Return type of the dispatched functions.
 /// @tparam Traits Traits class to customize the usage of the dispatcher. To define your own traits, you can (but don't have to)
-///  inherit the class aurora::DispatchTraits<K>, where K is your key. In general, the @a Traits class must contain the following members:
+///  inherit the class @ref aurora::DispatchTraits<K>, where K is your key. It predefines most members for convenience.
+///  In general, the @a Traits class must contain the following members:
 /// @code 
 /// struct Traits
 /// {
@@ -67,8 +68,9 @@ namespace aurora
 ///	    // as a key in std::unordered_map, i.e. it must support a std::hash<Key> specialization and operator==.
 ///	    typedef K Key;
 ///	    
-///	    // A function that returns the corresponding key (such as std::type_index) from a type identifier
-///	    // (such as aurora::Type<T>). Often, key and type identifier are the same.
+///	    // A function that returns the corresponding key (such as std::type_index) from a type identifier (such as aurora::Type<T>).
+///	    // The type identifier is passed to bind() and can contain static type information, while the key is used by the map
+///	    // storing the registered functions. Often, key and type identifier are the same. 
 ///	    static Key keyFromId(Id id);
 ///	    
 ///	    // Given a function argument base, this static function extracts the key from it. B corresponds to the template parameter
@@ -76,12 +78,13 @@ namespace aurora
 ///	    static Key keyFromBase(B base);
 ///	    
 ///	    // trampoline1() takes a function that is passed to SingleDispatcher::bind() and modifies it in order to fit the common
-///	    // R(B) signature. For example, this is the place to insert downcasts.
+///	    // R(B) signature. It therefore acts as a wrapper for user-defined functions which can link different signatures together.
+///	    // For example, this is the place to insert downcasts.
 ///	    // The first template parameter Id is required, as it will be explicitly specified when trampoline1() is called.
-///	     template <typename Id, typename Fn>
-///	     static std::function<R(B)> trampoline1(Fn f);
+///	    template <typename Id, typename Fn>
+///	    static std::function<R(B)> trampoline1(Fn f);
 ///	    
-///	    // Optional function that returns a string representation of @a key for debugging.
+///	    // Optional function that returns a string representation of key for debugging.
 ///	    static const char* name(Key k);
 /// };
 /// @endcode
