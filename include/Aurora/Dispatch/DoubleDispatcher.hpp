@@ -158,6 +158,7 @@ class DoubleDispatcher : private NonCopyable
 		/// @brief Registers a fallback function.
 		/// @details The passed function will be invoked when call() doesn't find a registered function. It can be used when
 		///  not finding a match does not represent an exceptional situation, but a common case.
+		/// @n@n If you want to perform no action, you can pass @ref aurora::NoOp<R, 2>().
 		/// @param function Function with signature R(B, B).
 		void						fallback(std::function<R(B, B)> function);
 
