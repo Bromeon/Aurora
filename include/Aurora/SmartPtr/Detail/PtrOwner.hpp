@@ -46,6 +46,7 @@
 #define AURORA_PTROWNER_HPP
 
 #include <Aurora/Tools/NonCopyable.hpp>
+#include <Aurora/SmartPtr/Detail/EmplaceTag.hpp>
 
 #include <cassert>
 #include <utility>
@@ -59,7 +60,6 @@ namespace detail
 	// Types to differ between copy, move and emplacement semantics
 	struct CopyTag {};
 	struct MoveTag {};
-	struct EmplaceTag {};
 
 	// Abstract base class for pointer owners
 	template <typename T>

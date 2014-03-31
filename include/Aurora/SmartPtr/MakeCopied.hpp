@@ -29,6 +29,7 @@
 #ifndef AURORA_MAKECOPIED_HPP
 #define AURORA_MAKECOPIED_HPP
 
+#include <Aurora/SmartPtr/Detail/EmplaceTag.hpp>
 #include <utility>	// std::forward()
 
 
@@ -38,11 +39,6 @@ namespace aurora
 // Forward declarations
 template <typename T>
 class CopiedPtr;
-
-namespace detail
-{
-	struct EmplaceTag;
-}
 
 // For documentation and modern compilers
 #if defined(AURORA_DOXYGEN_SECTION) || defined(AURORA_HAS_VARIADIC_TEMPLATES)
