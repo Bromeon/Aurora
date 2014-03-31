@@ -133,7 +133,9 @@ class SingleDispatcher : private NonCopyable
 		/// @tparam Fn %Type of the function. Can be deduced from the argument.
 		/// @param identifier Value that identifies the object. The key, which is mapped to the function, is computed from the
 		///  identifier through Traits::keyFromId(identifier).
-		/// @param functionObject Function to register and associate with the given identifier.
+		/// @param function Function to register and associate with the given identifier. Usually, the function has the
+		///  signature R(B), but it's possible to deviate from it (e.g. using derived classes), see also the note about
+		///  trampolines in the Traits classes.
 		template <typename Id, typename Fn>
 		void						bind(Id identifier, Fn function);
 
