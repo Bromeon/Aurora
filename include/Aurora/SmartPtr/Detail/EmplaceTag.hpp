@@ -23,14 +23,13 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-/// @file
-/// @brief Complete SmartPtr module
-
-#ifndef AURORA_MODULE_SMARTPTR_HPP
-#define AURORA_MODULE_SMARTPTR_HPP
-
-#include <Aurora/SmartPtr/CopiedPtr.hpp>
-#include <Aurora/SmartPtr/Detail/Factories.hpp>
-#include <Aurora/SmartPtr/PtrFunctors.hpp>
-
-#endif // AURORA_MODULE_SMARTPTR_HPP
+#ifndef AURORA_EMPLACETAG_HPP
+#define AURORA_EMPLACETAG_HPP
+namespace aurora
+{
+namespace detail
+{
+	struct EmplaceTag {};
+}
+}
+#endif
