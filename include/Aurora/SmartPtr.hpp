@@ -30,7 +30,6 @@
 #define AURORA_MODULE_SMARTPTR_HPP
 
 #include <Aurora/SmartPtr/CopiedPtr.hpp>
-#include <Aurora/SmartPtr/MakeCopied.hpp>
 #include <Aurora/SmartPtr/MakeUnique.hpp>
 #include <Aurora/SmartPtr/PtrFunctors.hpp>
 
