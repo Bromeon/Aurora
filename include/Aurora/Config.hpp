@@ -39,13 +39,20 @@
 #define AURORA_FAKE_DOC(real, fake) real
 
 
-// Output useful error message if MSVC, clang or g++ compilers do not support C++11
-#if defined(_MSC_VER) && _MSC_VER < 1600
-	#error At least Visual Studio 2010 is required.
-#elif defined(__clang__) && 100*__clang_major__ + __clang_minor__ < 301
-	#error At least clang 3.1 is required.
-#elif defined(__GNUG__) && 100*__GNUC__ + __GNUC_MINOR__ < 406
-	#error At least g++ 4.6 is required.
+// Output useful error message if MSVC, Clang or g++ compilers do not support C++11
+// Cascaded because symbols are not 100% reliable, clang sometimes defines g++ macros
+#if defined(_MSC_VER)
+	#if _MSC_VER < 1600
+		#error At least Visual Studio 2010 is required.
+	#endif
+#elif defined(__clang__)
+	#if 100*__clang_major__ + __clang_minor__ < 301
+		#error At least Clang 3.1 is required.
+	#endif
+#elif defined(__GNUC__)
+	#if 100*__GNUC__ + __GNUC_MINOR__ < 406
+		#error At least g++ 4.6 is required.
+	#endif
 #endif
 
 
