@@ -59,6 +59,25 @@ typename SingleDispatcher<Signature, Traits>::Result SingleDispatcher<Signature,
 }
 
 template <typename Signature, typename Traits>
+typename SingleDispatcher<Signature, Traits>::Result SingleDispatcher<Signature, Traits>::call(Parameter arg, UserData data) const
+{
+	Key key = Traits::keyFromBase(arg);
+
+	// If no corresponding class (or base class) has been found, throw exception
+	auto itr = mMap.find(key);
+	if (itr == mMap.end())
+	{
+		if (mFallback)
+			return mFallback(arg, data);
+		else
+			throw FunctionCallException(std::string("SingleDispatcher::call() - function with parameter \"") + Traits::name(key) + "\" not registered");
+	}
+
+	// Otherwise, call dispatched function
+	return itr->second(arg, data);
+}
+
+template <typename Signature, typename Traits>
 void SingleDispatcher<Signature, Traits>::fallback(std::function<Signature> function)
 {
 	mFallback = std::move(function);

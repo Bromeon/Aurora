@@ -110,7 +110,7 @@ struct DispatchTraits
 
 	/// @brief Returns a string representation of the key, for debugging
 	/// 
-	static const char* name(Key k)
+	static const char* name(Key)
 	{
 		return "unknown";
 	}
@@ -119,67 +119,114 @@ struct DispatchTraits
 /// @brief Identifies a class using RTTI.
 /// @details Default key for SingleDispatcher and DoubleDispatcher. With it, classes are identified using the compiler's
 ///  RTTI capabilities (in particular, the @a typeid operator).
-template <typename S>
-struct RttiDispatchTraits
-{
-private: 
-	typedef typename FunctionResult<S>::Type R;
-	typedef typename FunctionParam<S, 0>::Type B;
+template <typename S, std::size_t N>
+class RttiDispatchTraits
+{	
+	// ---------------------------------------------------------------------------------------------------------------------------
+	// Private types
+	private: 
+		typedef typename FunctionResult<S>::Type R;
+		typedef typename FunctionParam<S, 0>::Type B;
+		typedef typename FunctionParam<S, N>::Type U;
 
-	static_assert(std::is_polymorphic<typename std::remove_pointer<typename std::remove_reference<B>::type>::type>::value, 
-		"B must be a pointer or reference to a polymorphic base class.");
+		static_assert(std::is_polymorphic<typename std::remove_pointer<typename std::remove_reference<B>::type>::type>::value, 
+			"B must be a pointer or reference to a polymorphic base class.");
 
-public:
-	/// @brief Key type.
-	/// 
-	typedef std::type_index Key;
 
-	/// @brief Function that takes an object to identify and returns the corresponding std::type_index object.
-	/// 
-	static Key keyFromBase(B m)
-	{
-		return detail::derefTypeid(m);
-	}
+	// ---------------------------------------------------------------------------------------------------------------------------
+	// Public types and static member functions
+	public:
+		/// @brief Key type.
+		/// 
+		typedef std::type_index Key;
+
+		/// @brief Function that takes an object to identify and returns the corresponding std::type_index object.
+		/// 
+		static Key keyFromBase(B m)
+		{
+			return detail::derefTypeid(m);
+		}
 	
-	/// @brief Function that takes static type information and returns a type-erased std::type_index object.
-	/// 
-	template <typename T>
-	static Key keyFromId(Type<T> id)
-	{
-		return typeid(T);
-	}
-
-	/// @brief Wraps a function such that the argument is downcast before being passed
-	/// 
-	template <typename Id, typename Fn>
-	static std::function<S> trampoline1(Fn f)
-	{
-		return [f] (B arg) mutable -> R
+		/// @brief Function that takes static type information and returns a type-erased std::type_index object.
+		/// 
+		template <typename T>
+		static Key keyFromId(Type<T> id)
 		{
-			typedef AURORA_REPLICATE(B, typename Id::type) Derived;
-			return f(static_cast<Derived>(arg));
-		};
-	}
+			return typeid(T);
+		}
 
-	/// @brief Wraps a function such that both arguments are downcast before being passed
-	/// 
-	template <typename Id1, typename Id2, typename Fn>
-	static std::function<R(B, B)> trampoline2(Fn f)
-	{
-		return [f] (B arg1, B arg2) mutable -> R
+		/// @brief Wraps a function such that the argument is downcast before being passed
+		/// 
+		template <typename Id, typename Fn>
+		static std::function<S> trampoline1(Fn f)
 		{
-			typedef AURORA_REPLICATE(B, typename Id1::type) Derived1;
-			typedef AURORA_REPLICATE(B, typename Id2::type) Derived2;
-			return f(static_cast<Derived1>(arg1), static_cast<Derived2>(arg2));
-		};
-	}
+			return trampoline1<Id, Fn>(f, Int<FunctionArity<S>::value - N>());
+		}
 
-	/// @brief Returns a string representation of the key, for debugging
-	/// 
-	static const char* name(Key k)
-	{
-		return k.name();
-	}
+		/// @brief Wraps a function such that both arguments are downcast before being passed
+		/// 
+		template <typename Id1, typename Id2, typename Fn>
+		static std::function<S> trampoline2(Fn f)
+		{
+			return trampoline2<Id1, Id2, Fn>(f, Int<FunctionArity<S>::value - N>());
+		}
+
+		/// @brief Returns a string representation of the key, for debugging
+		/// 
+		static const char* name(Key k)
+		{
+			return k.name();
+		}
+
+
+	// ---------------------------------------------------------------------------------------------------------------------------
+	// Private types and static member functions
+	private:
+		// Implementation for signature without additional argument
+		template <typename Id, typename Fn>
+		static std::function<S> trampoline1(Fn f, Int<0>)
+		{
+			return [f] (B arg) mutable -> R
+			{
+				typedef AURORA_REPLICATE(B, typename Id::type) Derived;
+				return f(static_cast<Derived>(arg));
+			};
+		}
+
+		// Implementation for signature with a user-defined argument
+		template <typename Id, typename Fn>
+		static std::function<S> trampoline1(Fn f, Int<1>)
+		{
+			return [f] (B arg, U userData) mutable -> R
+			{
+				typedef AURORA_REPLICATE(B, typename Id::type) Derived;
+				return f(static_cast<Derived>(arg), userData);
+			};
+		}
+		
+		// Implementation for signature without additional argument
+		template <typename Id1, typename Id2, typename Fn>
+		static std::function<S> trampoline2(Fn f, Int<0>)
+		{
+			return [f] (B arg1, B arg2) mutable -> R
+			{
+				typedef AURORA_REPLICATE(B, typename Id1::type) Derived1;
+				typedef AURORA_REPLICATE(B, typename Id2::type) Derived2;
+				return f(static_cast<Derived1>(arg1), static_cast<Derived2>(arg2));
+			};
+		}
+
+		// Implementation for signature with a user-defined argument
+		template <typename Id1, typename Id2, typename Fn>
+		static std::function<S> trampoline2(Fn f, Int<1>)
+		{
+			return [f] (B arg1, B arg2, U userData) mutable -> R
+			{
+				typedef AURORA_REPLICATE(B, typename Id1::type) Derived1;
+				typedef AURORA_REPLICATE(B, typename Id2::type) Derived2;
+				return f(static_cast<Derived1>(arg1), static_cast<Derived2>(arg2), userData);
+			};
+		}
 };
 
 /// @brief Functor doing nothing
