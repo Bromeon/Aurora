@@ -34,7 +34,7 @@ SingleDispatcher<Signature, Traits>::SingleDispatcher()
 
 template <typename Signature, typename Traits>
 template <typename Id, typename Fn>
-void SingleDispatcher<Signature, Traits>::bind(Id identifier, Fn function)
+void SingleDispatcher<Signature, Traits>::bind(const Id& identifier, Fn function)
 {
 	mMap[Traits::keyFromId(identifier)] = Traits::template trampoline1<Id>(function);
 }

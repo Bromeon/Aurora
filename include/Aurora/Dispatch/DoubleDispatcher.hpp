@@ -166,7 +166,7 @@ class DoubleDispatcher : private NonCopyable
 		///  note about trampolines in the Traits classes. In case you specified a third parameter for the @a Signature template
 		///  parameter, the function should have the signature <i>Result(Parameter, Parameter, UserData)</i>.
 		template <typename Id1, typename Id2, typename Fn>
-		void						bind(Id1 identifier1, Id2 identifier2, Fn function);
+		void						bind(const Id1& identifier1, const Id2& identifier2, Fn function);
 
 		/// @brief Dispatches the key of @a arg1 and @a arg2 and invokes the corresponding function.
 		/// @details <i>Traits::keyFromBase(arg)</i> is invoked to determine the key of each passed argument. The function bound to

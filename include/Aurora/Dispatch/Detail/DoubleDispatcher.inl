@@ -36,7 +36,7 @@ DoubleDispatcher<Signature, Traits>::DoubleDispatcher(bool symmetric)
 
 template <typename Signature, typename Traits>
 template <typename Id1, typename Id2, typename Fn>
-void DoubleDispatcher<Signature, Traits>::bind(Id1 identifier1, Id2 identifier2, Fn function)
+void DoubleDispatcher<Signature, Traits>::bind(const Id1& identifier1, const Id2& identifier2, Fn function)
 {
 	SingleKey key1 = Traits::keyFromId(identifier1);
 	SingleKey key2 = Traits::keyFromId(identifier2);

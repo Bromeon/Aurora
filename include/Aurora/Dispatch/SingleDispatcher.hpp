@@ -156,7 +156,7 @@ class SingleDispatcher : private NonCopyable
 		///  trampolines in the Traits classes. In case you specified a second parameter for the @a Signature template
 		///  parameter, the function should have the signature <i>Result(Parameter, Parameter, UserData)</i>.
 		template <typename Id, typename Fn>
-		void						bind(Id identifier, Fn function);
+		void						bind(const Id& identifier, Fn function);
 
 		/// @brief Dispatches the key of @a arg and invokes the corresponding function
 		/// @details <i>Traits::keyFromBase(arg)</i> is invoked to determine the key of the passed argument. The function bound to

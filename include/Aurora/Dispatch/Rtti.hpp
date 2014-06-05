@@ -87,7 +87,7 @@ struct DispatchTraits
 
 	/// @brief Maps a key to itself (assuming key and type identifier are the same)
 	///
-	static Key keyFromId(Key k)
+	static const Key& keyFromId(const Key& k)
 	{
 		return k;
 	}
