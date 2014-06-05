@@ -26,21 +26,21 @@
 namespace aurora
 {
 
-template <class B, typename R, typename Traits>
-SingleDispatcher<B, R, Traits>::SingleDispatcher()
+template <typename Signature, typename Traits>
+SingleDispatcher<Signature, Traits>::SingleDispatcher()
 : mMap()
 {
 }
 
-template <class B, typename R, typename Traits>
+template <typename Signature, typename Traits>
 template <typename Id, typename Fn>
-void SingleDispatcher<B, R, Traits>::bind(Id identifier, Fn function)
+void SingleDispatcher<Signature, Traits>::bind(Id identifier, Fn function)
 {
 	mMap[Traits::keyFromId(identifier)] = Traits::template trampoline1<Id>(function);
 }
 
-template <class B, typename R, typename Traits>
-R SingleDispatcher<B, R, Traits>::call(B arg) const
+template <typename Signature, typename Traits>
+typename SingleDispatcher<Signature, Traits>::Result SingleDispatcher<Signature, Traits>::call(Parameter arg) const
 {
 	Key key = Traits::keyFromBase(arg);
 
@@ -58,8 +58,8 @@ R SingleDispatcher<B, R, Traits>::call(B arg) const
 	return itr->second(arg);
 }
 
-template <class B, typename R, class Traits>
-void SingleDispatcher<B, R, Traits>::fallback(std::function<R(B)> function)
+template <typename Signature, typename Traits>
+void SingleDispatcher<Signature, Traits>::fallback(std::function<Signature> function)
 {
 	mFallback = std::move(function);
 }

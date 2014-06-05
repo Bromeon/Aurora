@@ -119,12 +119,17 @@ struct DispatchTraits
 /// @brief Identifies a class using RTTI.
 /// @details Default key for SingleDispatcher and DoubleDispatcher. With it, classes are identified using the compiler's
 ///  RTTI capabilities (in particular, the @a typeid operator).
-template <class B, typename R>
+template <typename S>
 struct RttiDispatchTraits
 {
+private: 
+	typedef typename FunctionResult<S>::Type R;
+	typedef typename FunctionParam<S, 0>::Type B;
+
 	static_assert(std::is_polymorphic<typename std::remove_pointer<typename std::remove_reference<B>::type>::type>::value, 
 		"B must be a pointer or reference to a polymorphic base class.");
 
+public:
 	/// @brief Key type.
 	/// 
 	typedef std::type_index Key;
@@ -147,7 +152,7 @@ struct RttiDispatchTraits
 	/// @brief Wraps a function such that the argument is downcast before being passed
 	/// 
 	template <typename Id, typename Fn>
-	static std::function<R(B)> trampoline1(Fn f)
+	static std::function<S> trampoline1(Fn f)
 	{
 		return [f] (B arg) mutable -> R
 		{

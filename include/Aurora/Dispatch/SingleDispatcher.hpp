@@ -51,12 +51,13 @@ namespace aurora
 /// @details Sometimes you encounter the situation where you need to implement polymorphic behavior, but you cannot
 ///  or don't want to add a virtual function to an existing class hierarchy. Here comes dynamic dispatch into play:
 ///  You define free functions, which can be treated by the dispatcher like virtual functions.
-/// @tparam B Reference or pointer to polymorphic class, which is the base class of every dispatched function's
+/// @tparam Signature Function signature <b>R(B)</b>, with the following types:
+/// * <b>B</b>: Reference or pointer to polymorphic class, which is the base class of every dispatched function's
 ///  parameter type. When @a B is a pointer, the arguments of the dispatched functions shall be pointers too (the
 ///  same applies to references).
 ///  If @a B is a pointer or reference to const, the dispatched functions cannot modify their arguments. In this case,
 ///  the dispatched functions shall have arguments of type pointer or reference to const, too.
-/// @tparam R Return type of the dispatched functions.
+/// * <b>R</b>: Return type of the dispatched functions.
 /// @tparam Traits Traits class to customize the usage of the dispatcher. To define your own traits, you can (but don't have to)
 ///  inherit the class @ref aurora::DispatchTraits<K>, where K is your key. It predefines most members for convenience.
 ///  In general, the @a Traits class must contain the following members:
@@ -101,7 +102,7 @@ namespace aurora
 /// void func2(Derived2* d);
 ///
 /// // Create dispatcher and register functions
-/// aurora::SingleDispatcher<Base*> dispatcher;
+/// aurora::SingleDispatcher<void(Base*)> dispatcher;
 /// dispatcher.bind(aurora::Type<Derived1>(), &func1);
 /// dispatcher.bind(aurora::Type<Derived2>(), &func2);
 ///
@@ -110,15 +111,27 @@ namespace aurora
 /// dispatcher.call(ptr); // Invokes void func1(Derived1* d);
 /// delete ptr;
 /// @endcode
-template <class B, typename R = void, class Traits = RttiDispatchTraits<B, R>>
+template <typename Signature, class Traits = RttiDispatchTraits<Signature>>
 class SingleDispatcher : private NonCopyable
-{	 
+{	  
+	// ---------------------------------------------------------------------------------------------------------------------------
+	// Public types
+	public:
+		/// @brief Function return type
+		/// 
+		typedef typename FunctionResult<Signature>::Type		Result;
+
+		/// @brief Function parameter type
+		/// 
+		typedef typename FunctionParam<Signature, 0>::Type		Parameter;
+
+		
 	// ---------------------------------------------------------------------------------------------------------------------------
 	// Static assertions
 
 	// Make sure that B is either T* or T&
-	static_assert(std::is_pointer<B>::value || std::is_lvalue_reference<B>::value,
-		"Template argument B must be a pointer or reference.");
+	static_assert(std::is_pointer<Parameter>::value || std::is_lvalue_reference<Parameter>::value,
+		"Function parameter must be a pointer or reference.");
 
 	 
 	// ---------------------------------------------------------------------------------------------------------------------------
@@ -146,21 +159,21 @@ class SingleDispatcher : private NonCopyable
 		/// @param arg Function argument as a reference or pointer.
 		/// @return The return value of the dispatched function, if any.
 		/// @throw FunctionCallException when no corresponding function is found and no fallback has been registered.
-		R							call(B arg) const;
+		Result						call(Parameter arg) const;
 
 		/// @brief Registers a fallback function.
 		/// @details The passed function will be invoked when call() doesn't find a registered function. It can be used when
 		///  not finding a match does not represent an exceptional situation, but a common case.
 		/// @n@n If you want to perform no action, you can pass @ref aurora::NoOp<R, 1>().
 		/// @param function Function with signature R(B).
-		void						fallback(std::function<R(B)> function);
+		void						fallback(std::function<Signature> function);
 
 
 	// ---------------------------------------------------------------------------------------------------------------------------
 	// Private types
 	private:
 		typedef typename Traits::Key					Key;
-		typedef std::function<R(B)>						BaseFunction;
+		typedef std::function<Signature>				BaseFunction;
 		typedef std::unordered_map<Key, BaseFunction>	FnMap;
 
 

@@ -53,11 +53,12 @@ namespace aurora
 ///  dynamically on more than one type. Like overloading functions with two parameters at compile time, this class
 ///  allows you to perform a dispatch on two arguments at runtime. At invocation time, all you need is the static
 ///  type of the base class, the %DoubleDispatcher figures out which dynamic types match which function.
-/// @tparam B Reference or pointer to polymorphic base class. This is the base class of every dispatched function's
+/// @tparam Signature Function signature <b>R(B, B)</b>, with the following types:
+///  * <b>B</b>: Reference or pointer to polymorphic base class. This is the base class of every dispatched function's
 ///  parameter type. When it is a pointer, the arguments of the dispatched functions shall be pointers too (the
 ///  same applies to references).
 ///  the dispatched functions shall have arguments of type pointer or reference to const, too.
-/// @tparam R Return type of the dispatched functions.
+///  * <b>R</b>: Return type of the dispatched functions.
 /// @tparam Traits Traits class to customize the usage of the dispatcher. To define your own traits, you can (but don't have to)
 ///  inherit the class @ref aurora::DispatchTraits<K>, where K is your key. It predefines most members for convenience.
 ///  In general, the @a Traits class must contain the following members:
@@ -103,7 +104,7 @@ namespace aurora
 /// void func22(Derived2* lhs, Derived2* rhs);
 ///
 /// // Create dispatcher and register functions
-/// aurora::DoubleDispatcher<Base*> dispatcher;
+/// aurora::DoubleDispatcher<void(Base*,Base*)> dispatcher;
 /// dispatcher.bind(aurora::Type<Derived1>(), aurora::Type<Derived1>(), &func11);
 /// dispatcher.bind(aurora::Type<Derived1>(), aurora::Type<Derived2>(), &func12);
 /// dispatcher.bind(aurora::Type<Derived2>(), aurora::Type<Derived2>(), &func22);
@@ -113,17 +114,33 @@ namespace aurora
 /// dispatcher.call(ptr, ptr); // Invokes void func11(Derived1* lhs, Derived1* rhs);
 /// delete ptr;
 /// @endcode
-template <class B, typename R = void, class Traits = RttiDispatchTraits<B, R>>
+template <typename Signature, class Traits = RttiDispatchTraits<Signature>>
 class DoubleDispatcher : private NonCopyable
 {
+	// ---------------------------------------------------------------------------------------------------------------------------
+	// Public types
+	public:
+		/// @brief Function return type
+		/// 
+		typedef typename FunctionResult<Signature>::Type		Result;
+
+		/// @brief Function parameter type
+		/// 
+		typedef typename FunctionParam<Signature, 0>::Type		Parameter;
+
+		
 	// ---------------------------------------------------------------------------------------------------------------------------
 	// Static assertions
 
 	// Make sure that B is either T* or T&
-	static_assert(std::is_pointer<B>::value || std::is_lvalue_reference<B>::value,
-		"Template argument B must be a pointer or reference.");
+	static_assert(std::is_pointer<Parameter>::value || std::is_lvalue_reference<Parameter>::value,
+		"Function parameter must be a pointer or reference.");
 
+	// For signature R(X, Y), ensure that X == Y
+	static_assert(std::is_same<typename FunctionParam<Signature, 0>::Type, typename FunctionParam<Signature, 1>::Type>::value,
+		"The two function parameters must have the same type.");
 
+	 
 	// ---------------------------------------------------------------------------------------------------------------------------
 	// Public member functions
 	public:
@@ -155,21 +172,21 @@ class DoubleDispatcher : private NonCopyable
 		/// @param arg1,arg2 Function arguments as references or pointers.
 		/// @return The return value of the dispatched function, if any.
 		/// @throw FunctionCallException when no corresponding function is found and no fallback has been registered.
-		R							call(B arg1, B arg2) const;
+		Result						call(Parameter arg1, Parameter arg2) const;
 
 		/// @brief Registers a fallback function.
 		/// @details The passed function will be invoked when call() doesn't find a registered function. It can be used when
 		///  not finding a match does not represent an exceptional situation, but a common case.
 		/// @n@n If you want to perform no action, you can pass @ref aurora::NoOp<R, 2>().
 		/// @param function Function with signature R(B, B).
-		void						fallback(std::function<R(B, B)> function);
+		void						fallback(std::function<Signature> function);
 
 
 	// ---------------------------------------------------------------------------------------------------------------------------
 	// Private types
 	private:
-		typedef typename Traits::Key								SingleKey;
-		typedef std::function<R(B, B)>								BaseFunction;
+		typedef typename Traits::Key					SingleKey;
+		typedef std::function<Signature>				BaseFunction;
 
 		struct Key
 		{
