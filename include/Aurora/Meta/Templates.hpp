@@ -62,6 +62,27 @@ namespace detail
 	};
 
 
+#ifdef AURORA_HAS_VARIADIC_TEMPLATES
+
+	// Reverse of NthType: get index of type T in typelist Types
+	template <typename T, typename... Types>
+	struct IndexOfType;
+
+	template <typename T, typename Head, typename... Tail>
+	struct IndexOfType<T, Head, Tail...>
+	{
+		static const std::size_t value = 1 + IndexOfType<T, Tail...>::value;
+	};
+
+	template <typename T, typename... Tail>
+	struct IndexOfType<T, T, Tail...>
+	{
+		static const std::size_t value = 0;
+	};
+
+#endif // AURORA_HAS_VARIADIC_TEMPLATES
+
+
 	// Helper for FunctionSignature metafunction
 	template <typename R, std::size_t N, typename P0, typename P1, typename P2>
 	struct FunctionSignatureBase
