@@ -29,6 +29,7 @@
 #ifndef AURORA_MODULE_TOOLS_HPP
 #define AURORA_MODULE_TOOLS_HPP
 
+#include <Aurora/Tools/Downcast.hpp>
 #include <Aurora/Tools/Exceptions.hpp>
 #include <Aurora/Tools/ForEach.hpp>
 #include <Aurora/Tools/Hash.hpp>
