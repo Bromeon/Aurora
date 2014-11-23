@@ -31,6 +31,7 @@
 
 #include <Aurora/Config.hpp>
 #include <Aurora/Meta/Templates.hpp>
+#include <Aurora/Meta/Variadic.hpp>
 
 #include <tuple>
 

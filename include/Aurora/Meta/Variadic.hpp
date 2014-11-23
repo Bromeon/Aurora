@@ -24,14 +24,46 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 /// @file
-/// @brief Complete Meta module
+/// @brief Metaprogramming helpers for variadic templates
 
-#ifndef AURORA_MODULE_META_HPP
-#define AURORA_MODULE_META_HPP
+#ifndef AURORA_VARIADIC_HPP
+#define AURORA_VARIADIC_HPP
 
-#include <Aurora/Meta/Preprocessor.hpp>
-#include <Aurora/Meta/Templates.hpp>
-#include <Aurora/Meta/Tuple.hpp>
-#include <Aurora/Meta/Variadic.hpp>
+#include <Aurora/Config.hpp>
 
-#endif // AURORA_MODULE_META_HPP
+#ifdef AURORA_HAS_VARIADIC_TEMPLATES
+
+namespace aurora
+{
+namespace detail
+{
+
+	// Reverse of NthType: get index of type T in typelist Types
+	template <typename T, typename... Types>
+	struct IndexOfType;
+
+	template <typename T, typename Head, typename... Tail>
+	struct IndexOfType<T, Head, Tail...>
+	{
+		static const std::size_t value = 1 + IndexOfType<T, Tail...>::value;
+	};
+
+	template <typename T, typename... Tail>
+	struct IndexOfType<T, T, Tail...>
+	{
+		static const std::size_t value = 0;
+	};
+
+} // namespace detail
+
+
+/// @addtogroup Meta
+/// @{
+
+
+/// @}
+
+} // namespace aurora
+
+#endif // AURORA_HAS_VARIADIC_TEMPLATES
+#endif // AURORA_VARIADIC_HPP
