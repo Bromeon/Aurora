@@ -114,6 +114,16 @@ namespace detail
 /// @addtogroup Meta
 /// @{
 
+/// @brief Class template to store a list of types
+/// @details Variadic parameter packs are neither types nor templates, which makes them sometimes uncomfortable to work with.
+/// Typelists mitigate this by giving parameter packs first-class semantics. For example, they can be used for overload resolution
+/// (similar to aurora::Type), or they make it possible to pass around more than a single list of types. Of course, it is also
+/// possible to apply a wide variety of metafunctions on a typelist.
+/// @n@n Typelist instances carry no data.
+template <typename... Ts>
+struct Typelist
+{
+};
 
 /// @brief Apply function for each type in variadic parameter pack
 /// @tparam Ts Typelist to iterate through.
