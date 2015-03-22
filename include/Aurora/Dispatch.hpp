@@ -29,8 +29,8 @@
 #ifndef AURORA_MODULE_DISPATCH_HPP
 #define AURORA_MODULE_DISPATCH_HPP
 
+#include <Aurora/Dispatch/DispatchTraits.hpp>
 #include <Aurora/Dispatch/DoubleDispatcher.hpp>
-#include <Aurora/Dispatch/Rtti.hpp>
 #include <Aurora/Dispatch/SingleDispatcher.hpp>
 
 #endif // AURORA_MODULE_DISPATCH_HPP

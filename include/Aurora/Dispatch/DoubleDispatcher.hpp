@@ -29,7 +29,7 @@
 #ifndef AURORA_DOUBLEDISPATCHER_HPP
 #define AURORA_DOUBLEDISPATCHER_HPP
 
-#include <Aurora/Dispatch/Rtti.hpp>
+#include <Aurora/Dispatch/DispatchTraits.hpp>
 #include <Aurora/Tools/NonCopyable.hpp>
 #include <Aurora/Tools/Exceptions.hpp>
 #include <Aurora/Tools/Hash.hpp>

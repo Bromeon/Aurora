@@ -23,13 +23,12 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#ifndef AURORA_RTTI_HPP
-#define AURORA_RTTI_HPP
+#ifndef AURORA_DISPATCHTRAITS_HPP
+#define AURORA_DISPATCHTRAITS_HPP
 
 /// @file
-/// @brief Manual enhancements of Runtime Type Information
+/// @brief Class template aurora::DispatchTraits
 
-#include <Aurora/Dispatch/Detail/RttiImpl.hpp>
 #include <Aurora/Meta/Templates.hpp>
 #include <Aurora/Config.hpp>
 
@@ -39,39 +38,29 @@
 
 namespace aurora
 {
+namespace detail
+{
+	// Type-information for dereferenced type
+	// Important: Do not const-qualify parameters, or the first overload will accept const U*
+	template <typename T>
+	std::type_index derefTypeid(T& reference)
+	{
+		return typeid(reference);
+	}
+
+	template <typename T>
+	std::type_index derefTypeid(T* pointer)
+	{
+		return typeid(*pointer);
+	}
+
+} // namespace detail
+	
+// ---------------------------------------------------------------------------------------------------------------------------
+	
 
 /// @addtogroup Dispatch
 /// @{
-
-/// @brief Register runtime type information for a base class
-/// @details You need this for the dynamic dispatchers to cope with derived-to-base conversions.
-/// Since C++ offers no possibility to recognize the base classes of a class at runtime, this must be done manually.
-/// Note that multiple inheritance is not supported.
-/// @n@n Example class hierarchy:
-/// @code
-/// class Vehicle { public: virtual ~Vehicle(); }
-/// class Aircraft : public Vehicle {};
-/// class Watercraft : public Vehicle {};
-/// class Ship : public Watercraft {};
-/// class Submarine : public Watercraft {};
-/// @endcode
-/// Register classes as follows (once inside a function):
-/// @code
-/// AURORA_RTTI_BASE(Vehicle)
-///   AURORA_RTTI_DERIVED(Aircraft)
-///   AURORA_RTTI_DERIVED(Watercraft);
-/// AURORA_RTTI_BASE(Watercraft)
-///   AURORA_RTTI_DERIVED(Ship)
-///   AURORA_RTTI_DERIVED(Submarine);
-/// @endcode
-/// @hideinitializer
-#define AURORA_RTTI_BASE(BaseClass)			::aurora::detail::RttiClass(typeid(BaseClass))
-
-/// @brief Register runtime type information for a derived class
-/// @see AURORA_RTTI_BASE
-/// @hideinitializer
-#define AURORA_RTTI_DERIVED(DerivedClass)	.derived(typeid(DerivedClass))
-
 
 /// @brief Helper base class to implement custom traits for dispatchers
 /// @details This class provides some default type definitions and static member functions. Inherit it
@@ -272,4 +261,4 @@ struct NoOp<R, 2>
 
 } // namespace aurora
 
-#endif // AURORA_RTTI_HPP
+#endif // AURORA_DISPATCHTRAITS_HPP

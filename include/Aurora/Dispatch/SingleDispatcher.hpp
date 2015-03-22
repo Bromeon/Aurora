@@ -29,7 +29,7 @@
 #ifndef AURORA_SINGLEDISPATCHER_HPP
 #define AURORA_SINGLEDISPATCHER_HPP
 
-#include <Aurora/Dispatch/Rtti.hpp>
+#include <Aurora/Dispatch/DispatchTraits.hpp>
 #include <Aurora/Tools/NonCopyable.hpp>
 #include <Aurora/Tools/Exceptions.hpp>
 #include <Aurora/Meta/Templates.hpp>
