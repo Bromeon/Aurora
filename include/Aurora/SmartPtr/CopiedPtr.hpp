@@ -29,7 +29,7 @@
 #ifndef AURORA_COPIEDPTR_HPP
 #define AURORA_COPIEDPTR_HPP
 
-#include <Aurora/SmartPtr/PtrFunctors.hpp>
+#include <Aurora/SmartPtr/ClonersAndDeleters.hpp>
 #include <Aurora/SmartPtr/Detail/PtrOwner.hpp>
 #include <Aurora/Tools/SafeBool.hpp>
 #include <Aurora/Config.hpp>

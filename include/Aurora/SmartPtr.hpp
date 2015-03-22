@@ -31,6 +31,6 @@
 
 #include <Aurora/SmartPtr/CopiedPtr.hpp>
 #include <Aurora/SmartPtr/MakeUnique.hpp>
-#include <Aurora/SmartPtr/PtrFunctors.hpp>
+#include <Aurora/SmartPtr/ClonersAndDeleters.hpp>
 
 #endif // AURORA_MODULE_SMARTPTR_HPP
