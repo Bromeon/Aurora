@@ -39,6 +39,15 @@
 #define AURORA_FAKE_DOC(real, fake) real
 
 
+// Tell the compiler that a code path is unreachable, to disable warnings and enable optimizations
+// Most common case: default label in switch statements
+#if defined(_MSC_VER)
+	#define AURORA_UNREACHABLE __assume(false)
+#elif defined(__GNUC__) || defined(__clang__)
+	#define AURORA_UNREACHABLE __builtin_unreachable()
+#endif
+
+
 // Output useful error message if MSVC, Clang or g++ compilers do not support C++11
 // Cascaded because symbols are not 100% reliable, clang sometimes defines g++ macros
 #if defined(_MSC_VER)
