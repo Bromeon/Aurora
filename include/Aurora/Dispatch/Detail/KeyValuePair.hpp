@@ -23,10 +23,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#ifndef AURORA_ASSOCIATIVEHELPERS_HPP
-#define AURORA_ASSOCIATIVEHELPERS_HPP
-
-#include <algorithm>
+#ifndef AURORA_KEYVALUEPAIR_HPP
+#define AURORA_KEYVALUEPAIR_HPP
 
 
 namespace aurora
@@ -55,32 +53,7 @@ namespace detail
 		return lhs.key < rhs.key;
 	}
 	
-	// ---------------------------------------------------------------------------------------------------------------------------
-	
-	
-	// Are values equivalent with respect to sorting criterion? (Not necessarily equal)
-	template <typename T>
-	bool equivalent(const T& lhs, const T& rhs)
-	{
-		return !(lhs < rhs) && !(rhs < lhs);
-	}
-
-	// Binary search with useful return value, in contrast to std::binary_search()
-	// Returns either iterator to first found element, or end-iterator of sequence
-	template <typename ForwardIterator, typename T>
-	ForwardIterator binarySearch(ForwardIterator first, ForwardIterator last, const T& value)
-	{
-		// Note: std::lower_bound() has O(log n) on random access iterators 
-		ForwardIterator result = std::lower_bound(first, last, value);
-
-		// std::lower_bound() returns iterator to first element >= value, which can be inequal to value
-		if (result == last || !equivalent(*result, value))
-			return last;
-		else
-			return result;
-	}
-
 } // namespace detail
 } // namespace aurora
 
-#endif // AURORA_ASSOCIATIVEHELPERS_HPP
+#endif // AURORA_KEYVALUEPAIR_HPP
