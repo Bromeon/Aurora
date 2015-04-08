@@ -125,6 +125,18 @@ struct Typelist
 {
 };
 
+/// @brief Concatenate two typelists
+/// @details Metafunction that puts two typelists together. The @a Type member holds the resulting aurora::Typelist type.
+template <typename LhsTypelist, typename RhsTypelist>
+struct TypelistCat;
+
+template <typename... Ts, typename... Us>
+struct TypelistCat<Typelist<Ts...>, Typelist<Us...>>
+{
+	typedef Typelist<Ts..., Us...> Result;
+};
+
+
 /// @brief Apply function for each type in variadic parameter pack
 /// @tparam Ts Typelist to iterate through.
 /// @param fn Function object with a member function template <b>void operator() ()</b>.
