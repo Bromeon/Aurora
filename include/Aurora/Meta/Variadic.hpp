@@ -37,6 +37,10 @@
 
 namespace aurora
 {
+
+template <typename... Ts>
+struct Typelist;
+
 namespace detail
 {
 
@@ -83,6 +87,12 @@ namespace detail
 		static void apply(Function&& /*fn*/)
 		{
 		}
+	};
+
+	// Specialization for typelists: Unpack arguments and use ForEachType as usual
+	template <typename Function, typename... Ts>
+	struct ForEachType<Function, Typelist<Ts...>> : ForEachType<Function, Ts...>
+	{
 	};
 
 
@@ -133,12 +143,31 @@ struct TypelistCat;
 template <typename... Ts, typename... Us>
 struct TypelistCat<Typelist<Ts...>, Typelist<Us...>>
 {
-	typedef Typelist<Ts..., Us...> Result;
+	typedef Typelist<Ts..., Us...> Type;
+};
+
+
+/// @brief Check if type is part of typelist
+/// @details The boolean @a value member constant is true when @a T is a member of @a Types, false when not.
+template <typename Typelist1, typename T>
+struct TypelistContains;
+
+template <typename U, typename... Us, typename T>
+struct TypelistContains<Typelist<U, Us...>, T>
+{
+	static const bool value =
+		std::is_same<U, T>::value || TypelistContains<Typelist<Us...>, T>::value;
+};
+
+template <typename T>
+struct TypelistContains<Typelist<>, T>
+{
+	static const bool value = false;
 };
 
 
 /// @brief Apply function for each type in variadic parameter pack
-/// @tparam Ts Typelist to iterate through.
+/// @tparam Ts List of types to iterate through. Can also be a single type of aurora::Typelist<...>.
 /// @param fn Function object with a member function template <b>void operator() ()</b>.
 /// @details For each type @a T in @a Ts, the @a fn's operator() is called with explicit template argument @a T. Example:
 /// @code
