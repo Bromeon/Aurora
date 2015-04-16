@@ -96,6 +96,16 @@ void removeIf(Container& c, const Predicate& p)
 	c.erase(begin, c.end());
 }
 
+/// @brief Pop from queue with return value
+/// @details Combines std::queue's pop() and front() operations.
+template <typename Queue>
+typename Queue::value_type pop(Queue& q)
+{
+	auto value = std::move(q.front());
+	q.pop();
+	return value;
+}
+
 /// @brief Returns the value type for a specific key.
 /// @details Assumes existence of the key, returns corresponding mapped type without inserting it.
 ///  In contrast to <i>std::[unordered_]map::at()</i>, this does not throw exceptions. If the key
