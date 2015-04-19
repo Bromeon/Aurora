@@ -145,6 +145,15 @@ class SingleDispatcher : private NonCopyable
 		/// @brief Default constructor
 									SingleDispatcher();
 
+		/// @brief Move constructor
+									SingleDispatcher(SingleDispatcher&& source);
+
+		/// @brief Move assignment operator
+		SingleDispatcher&			operator= (SingleDispatcher&& source);
+
+		/// @brief Destructor
+									~SingleDispatcher();
+
 		/// @brief Registers a function bound to a specific key
 		/// @tparam Id %Type that identifies the class. By default, this is aurora::Type<D>, where D is the derived class.
 		///  Can be deduced from the argument.

@@ -29,6 +29,28 @@ namespace aurora
 template <typename Signature, typename Traits>
 SingleDispatcher<Signature, Traits>::SingleDispatcher()
 : mMap()
+, mFallback()
+{
+}
+
+template <typename Signature, typename Traits>
+SingleDispatcher<Signature, Traits>::SingleDispatcher(SingleDispatcher&& source)
+: mMap(std::move(source.mMap))
+, mFallback(std::move(source.mFallback))
+{
+}
+
+template <typename Signature, typename Traits>
+SingleDispatcher<Signature, Traits>& SingleDispatcher<Signature, Traits>::operator= (SingleDispatcher&& source)
+{
+	mMap = std::move(source.mMap);
+	mFallback = std::move(source.mFallback);
+
+	return *this;
+}
+
+template <typename Signature, typename Traits>
+SingleDispatcher<Signature, Traits>::~SingleDispatcher()
 {
 }
 

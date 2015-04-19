@@ -155,6 +155,15 @@ class DoubleDispatcher : private NonCopyable
 		///  to different functions.
 		explicit					DoubleDispatcher(bool symmetric = true);
 
+		/// @brief Move constructor
+									DoubleDispatcher(DoubleDispatcher&& source);
+
+		/// @brief Move assignment operator
+		DoubleDispatcher&			operator= (DoubleDispatcher&& source);
+
+		/// @brief Destructor
+									~DoubleDispatcher();
+
 		/// @brief Registers a function bound to a specific key.
 		/// @tparam Id1,Id2 %Types that identify the argument types. By default, these are aurora::Type<D>, where D is a
 		///  derived class. Can be deduced from the argument.
