@@ -141,6 +141,7 @@ class RttiDispatchTraits
 		template <typename T>
 		static Key keyFromId(Type<T> id)
 		{
+			static_cast<void>(id); // unused parameter
 			return typeid(T);
 		}
 
