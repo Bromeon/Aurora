@@ -44,6 +44,3 @@
 
 /// @defgroup Tools Tools
 /// @brief C++ utility and idioms, such as noncopyable base classes, foreach macros or safe bool idiom.
-
-/// @defgroup Range Range
-/// @brief Type-erased ranges, a generic abstraction from iterator interfaces.
