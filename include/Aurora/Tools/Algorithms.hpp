@@ -67,7 +67,7 @@ ForwardIterator binarySearch(ForwardIterator first, ForwardIterator last, const 
 }
 
 /// @brief Erase element using swap-and-pop_back idiom
-/// @details Erases the element at position @a itr by swapping it with the last element in the container
+/// @details Erases the element at position @c itr by swapping it with the last element in the container
 ///  and erasing the last element. This O(1) operation is particularly useful for std::vector or std::deque
 ///  as long as the element order is not relevant.
 template <typename Container, typename Iterator>
@@ -79,7 +79,7 @@ void eraseUnordered(Container& c, Iterator itr)
 }
 
 /// @brief Erase-remove idiom
-/// @details Removes value @a v from sequential container @a c (std::vector or std::deque)
+/// @details Removes value @c v from sequential container @c c (std::vector or std::deque)
 template <typename Container, typename Value>
 void remove(Container& c, const Value& v)
 {
@@ -88,7 +88,7 @@ void remove(Container& c, const Value& v)
 }
 
 /// @brief Erase-remove-if idiom
-/// @details Removes value @a v from sequential container @a c (std::vector or std::deque)
+/// @details Removes value @c v from sequential container @c c (std::vector or std::deque)
 template <typename Container, typename Predicate>
 void removeIf(Container& c, const Predicate& p)
 {
@@ -108,7 +108,7 @@ typename Queue::value_type pop(Queue& q)
 
 /// @brief Returns the value type for a specific key.
 /// @details Assumes existence of the key, returns corresponding mapped type without inserting it.
-///  In contrast to <i>std::[unordered_]map::at()</i>, this does not throw exceptions. If the key
+///  In contrast to <tt>std::[unordered_]map::at()</tt>, this does not throw exceptions. If the key
 ///  is not available, the behavior is undefined, in favor of optimized performance.
 template <typename AssocContainer, typename Key>
 typename AssocContainer::mapped_type& mapAt(AssocContainer& map, const Key& k)
