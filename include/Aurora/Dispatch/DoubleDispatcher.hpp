@@ -197,7 +197,7 @@ class DoubleDispatcher : private NonCopyable
 		///  correct parameters in the registered functions, even if the order is different. When necessary, they are swapped.
 		///  In other words, symmetric dispatchers don't care about the order of the first two arguments.
 		///  @n@n This method is only enabled if the @a Signature template parameter contains 3 parameters.
-		/// @param arg Function argument as a reference or pointer.
+		/// @param arg1,arg2 Function arguments as references or pointers.
 		/// @param data An additional user argument that is forwarded to the function.
 		/// @return The return value of the dispatched function, if any.
 		/// @throw FunctionCallException when no corresponding function is found and no fallback has been registered.
@@ -206,7 +206,7 @@ class DoubleDispatcher : private NonCopyable
 		/// @brief Registers a fallback function.
 		/// @details The passed function will be invoked when call() doesn't find a registered function. It can be used when
 		///  not finding a match does not represent an exceptional situation, but a common case.
-		/// @n@n If you want to perform no action, you can pass @ref aurora::NoOp<R, 2>().
+		/// @n@n If you want to perform no action, you can pass aurora::NoOp<R, 2>().
 		/// @param function Function according to the specified signature.
 		void						fallback(std::function<Signature> function);
 

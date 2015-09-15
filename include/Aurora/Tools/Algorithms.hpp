@@ -41,7 +41,7 @@ namespace aurora
 
 /// @brief Determines whether two values are considered equivalent in sorting
 /// @details Equal implies equivalent, but not vice versa. Two values are considered
-///  equivalent if neither appears the other (w.r.t. sorting criterion, here operator<)
+///  equivalent if neither appears before the other (w.r.t. sorting criterion, here operator<)
 template <typename T>
 bool equivalent(const T& lhs, const T& rhs)
 {
@@ -97,7 +97,7 @@ void removeIf(Container& c, const Predicate& p)
 }
 
 /// @brief Pop from queue with return value
-/// @details Combines std::queue's pop() and front() operations.
+/// @details Combines std::queue's %pop() and front() operations.
 template <typename Queue>
 typename Queue::value_type pop(Queue& q)
 {

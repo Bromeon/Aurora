@@ -315,7 +315,7 @@ void swap(CopiedPtr<T>& lhs, CopiedPtr<T>& rhs)
 
 
 // For documentation and modern compilers
-#if defined(AURORA_DOXYGEN_SECTION) || defined(AURORA_HAS_VARIADIC_TEMPLATES)
+#ifdef AURORA_HAS_VARIADIC_TEMPLATES
 
 /// @relates CopiedPtr
 /// @brief Emplaces an object directly inside the copied pointer.
@@ -338,7 +338,7 @@ CopiedPtr<T> makeCopied(Args&&... args)
 }
 
 // Unoptimized fallback for compilers that don't support variadic templates, emulated by preprocessor metaprogramming
-#else  // defined(AURORA_DOXYGEN_SECTION) || defined(AURORA_HAS_VARIADIC_TEMPLATES)
+#else  // AURORA_HAS_VARIADIC_TEMPLATES
 
 #include <Aurora/SmartPtr/Detail/Factories.hpp>
 
@@ -348,7 +348,7 @@ CopiedPtr<T> makeCopied(Args&&... args)
 // Generate code
 AURORA_PP_ENUMERATE(AURORA_PP_LIMIT, AURORA_DETAIL_COPIEDPTR_FACTORY)
 
-#endif // defined(AURORA_DOXYGEN_SECTION) || defined(AURORA_HAS_VARIADIC_TEMPLATES)
+#endif // AURORA_HAS_VARIADIC_TEMPLATES
 
 /// @}
 
