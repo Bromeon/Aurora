@@ -32,6 +32,7 @@
 #include <Aurora/SmartPtr/ClonersAndDeleters.hpp>
 #include <Aurora/SmartPtr/Detail/PtrOwner.hpp>
 #include <Aurora/Tools/SafeBool.hpp>
+#include <Aurora/Tools/Swap.hpp>
 #include <Aurora/Config.hpp>
 
 #include <algorithm>
@@ -218,8 +219,8 @@ class CopiedPtr
 		/// 
 		void swap(CopiedPtr& other)
 		{
-			std::swap(mOwner, other.mOwner);
-			std::swap(mPointer, other.mPointer);
+			adlSwap(mOwner, other.mOwner);
+			adlSwap(mPointer, other.mPointer);
 		}
 		
 		/// @brief Dereferences the pointer.

@@ -123,8 +123,7 @@ class PImpl
 		/// 
 		void swap(PImpl& other)
 		{
-			// TODO: ADL swap
-			std::swap(*storage(), *other.storage());
+			adlSwap(*storage(), *other.storage());
 		}
 
 		/// @brief Returns the implementation object.

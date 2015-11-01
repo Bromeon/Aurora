@@ -130,8 +130,8 @@ class Any
 		/// 
 		void swap(Any& other)
 		{
-			aurora::swap(mPointer, other.mPointer);
-			std::swap(mType, other.mType);
+			adlSwap(mPointer, other.mPointer);
+			adlSwap(mType, other.mType);
 		}
 
 		/// @brief Returns a reference to the contained value.

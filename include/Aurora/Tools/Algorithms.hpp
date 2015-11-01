@@ -29,6 +29,8 @@
 #ifndef AURORA_ALGORITHMS_HPP
 #define AURORA_ALGORITHMS_HPP
 
+#include <Aurora/Tools/Swap.hpp>
+
 #include <algorithm>
 #include <cassert>
 
@@ -73,8 +75,7 @@ ForwardIterator binarySearch(ForwardIterator first, ForwardIterator last, const 
 template <typename Container, typename Iterator>
 void eraseUnordered(Container& c, Iterator itr)
 {
-	using std::swap;
-	swap(*itr, c.back());
+	adlSwap(*itr, c.back());
 	c.pop_back();
 }
 
