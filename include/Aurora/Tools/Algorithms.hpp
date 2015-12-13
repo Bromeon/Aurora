@@ -107,6 +107,15 @@ typename Queue::value_type pop(Queue& q)
 	return value;
 }
 
+/// @brief Clear std::queue
+/// @details Calls pop() repeatedly until the queue is empty.
+template <typename Queue>
+void clearQueue(Queue& q)
+{
+	while (!q.empty())
+		q.pop();
+}
+
 /// @brief Returns the value type for a specific key.
 /// @details Assumes existence of the key, returns corresponding mapped type without inserting it.
 ///  In contrast to <tt>std::[unordered_]map::at()</tt>, this does not throw exceptions. If the key
