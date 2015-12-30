@@ -174,6 +174,8 @@ struct FunctionArity
 #define AURORA_ENABLE_IF(...)  , typename std::enable_if<__VA_ARGS__>::type* = nullptr
 
 
+#if defined(AURORA_DOXYGEN_SECTION)
+
 /// @brief Macro to ensure complete type
 /// @details Usage:
 /// @code
@@ -185,7 +187,18 @@ struct FunctionArity
 /// }
 /// @endcode
 /// @hideinitializer
-#define AURORA_REQUIRE_COMPLETE_TYPE(Type) typedef char auroraRequireCompleteType[(sizeof(Type))]
+#define AURORA_REQUIRE_COMPLETE_TYPE(Type) ImplementationDefined
+
+#elif defined(__GNUC__) || defined(__clang__)
+
+	// g++ and clang issue a warning regarding the unused typedef
+	#define AURORA_REQUIRE_COMPLETE_TYPE(Type) typedef char auroraRequireCompleteType[(sizeof(Type))] __attribute__((unused))
+
+#else
+
+	#define AURORA_REQUIRE_COMPLETE_TYPE(Type) typedef char auroraRequireCompleteType[(sizeof(Type))]
+
+#endif
 
 
 /// @brief Function declaration with inferred return type
