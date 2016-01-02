@@ -2,9 +2,9 @@
 
 Aurora is an open-source C++ library providing various rather uncommon C++ utilities. Features include:
 
-* Named tuples
 * Dynamic dispatch
-* Ranges as iterator abstraction
+* Named tuples
+* Optional types
 * Smart pointers with deep-copy semantics
 * Basic template and preprocessor metaprogramming
 * ...
